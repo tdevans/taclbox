@@ -5,6 +5,10 @@
 		],
 		"architecture" : [
 			{"name" : "rtl", "entity" : "test_entity"}
+		],
+		"packageHeader" : [
+		],
+		"packageBody" : [
 		]
 	},
 	"depends" : {
@@ -15,9 +19,7 @@
 			{"name" : "std_logic_1164", "library" : "ieee"},
 			{"name" : "numeric_std", "library" : "ieee"}
 		],
-		"entity" : [
-		],
-		"architecture" : [
+		"module" : [
 		]
 	}
 }

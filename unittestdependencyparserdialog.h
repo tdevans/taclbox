@@ -3,9 +3,6 @@
 
 #include <QDialog>
 #include <QList>
-#include <QTreeWidgetItem>
-#include <QMap>
-#include <QStringList>
 
 namespace Ui {
 class UnitTestDependencyParserDialog;
@@ -20,17 +17,78 @@ public:
     ~UnitTestDependencyParserDialog();
 
 private:
-    struct tTestFileStatus
+    Ui::UnitTestDependencyParserDialog *ui;
+
+    struct ExpectFileEntityDefinition
     {
-        QString filename;
+        QString name;
+    };
+
+    struct ExpectFileArchitectureDefinition
+    {
+        QString name;
+        QString entityName;
+    };
+
+    struct ExpectFilePackageHeaderDefinition
+    {
+        QString name;
+    };
+
+    struct ExpectFilePackageBodyDefinition
+    {
+        QString name;
+    };
+
+    struct ExpectFileLibraryDependency
+    {
+        QString name;
+    };
+
+    struct ExpectFilePackageDependency
+    {
+        QString name;
+        QString libraryName;
+    };
+
+    struct ExpectFileModuleDependency
+    {
+        QString libraryName;
+        QString entityName;
+        QString architectureName;
+        QString instanceName;
+    };
+
+    struct ExpectFile
+    {
+        QString filePath;
+        QList<ExpectFileEntityDefinition> entityDefinitions;
+        QList<ExpectFileArchitectureDefinition> architectureDefinitions;
+        QList<ExpectFilePackageHeaderDefinition> packageHeaderDefinitions;
+        QList<ExpectFilePackageBodyDefinition> packageBodyDefinitions;
+        QList<ExpectFileLibraryDependency> libraryDependencies;
+        QList<ExpectFilePackageDependency> packageDependencies;
+        QList<ExpectFileModuleDependency> moduleDependencies;
+    };
+
+    struct TestFile
+    {
+        QString filePath;
         bool testRun;
         bool testPass;
     };
 
-    Ui::UnitTestDependencyParserDialog *ui;
-    QMap<QString, QList<tTestFileStatus>> mExpectTestFileMap;
+    struct TestCase
+    {
+        ExpectFile expectFile;
+        QList<TestFile> testFiles;
+    };
+
+    QList<TestCase> mTestCases;
 
     void refreshTable();
+
+    ExpectFile parseExpectFile(QString filePath);
 
 private slots:
 };
