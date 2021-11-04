@@ -1,0 +1,23 @@
+{
+	"defines" : {
+		"entity" : [
+			{"name" :"test_entity"}
+		],
+		"architecture" : [
+			{"name" : "rtl", "entity" : "test_entity"}
+		]
+	},
+	"depends" : {
+		"library" : [
+			{"name" : "ieee"}
+		],
+		"package" : [
+			{"name" : "std_logic_1164", "library" : "ieee"},
+			{"name" : "numeric_std", "library" : "ieee"}
+		],
+		"entity" : [
+		],
+		"architecture" : [
+		]
+	}
+}
