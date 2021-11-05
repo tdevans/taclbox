@@ -21,6 +21,8 @@ public:
     void setType(QString type);
 
 private:
+    static const QString GENERIC_PATTERN;
+
     QString mName;
     QString mType;
 };
