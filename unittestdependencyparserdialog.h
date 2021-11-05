@@ -87,10 +87,10 @@ private:
     QList<TestCase> mTestCases;
 
     void refreshTable();
-
     ExpectFile parseExpectFile(QString filePath);
 
 private slots:
+    void runTests();
 };
 
 #endif // UNITTESTDEPENDENCYPARSERDIALOG_H

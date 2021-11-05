@@ -2,7 +2,7 @@
 #include <QRegularExpression>
 #include <QDebug>
 
-const QString DependencyParserEntityDefinition::ENTITY_START_PATTERN = "entity\\s+(?<name[a-zA-Z]\\w*)\\s+is"; // Capture group grabs the entity name
+const QString DependencyParserEntityDefinition::ENTITY_START_PATTERN = "entity\\s+(?<name>[a-zA-Z]\\w*)\\s+is"; // Capture group grabs the entity name
 const QString DependencyParserEntityDefinition::ENTITY_END_PATTERN = "end\\s+(?:entity\\s+)%1;"; // Make entity name variable here, to be filled in when we start the entity
 const QString DependencyParserEntityDefinition::GENERIC_SECTION_START_PATTERN = "generic\\s*\\(";
 const QString DependencyParserEntityDefinition::PORT_SECTION_START_PATTERN = "port\\s*\\(";
@@ -26,21 +26,51 @@ QList<DependencyParserEntityDefinition> DependencyParserEntityDefinition::parseT
 
     int entityStart = 0;
     QRegularExpression entityStartRegex(ENTITY_START_PATTERN);
+    QRegularExpression genericSectionStartRegex(GENERIC_SECTION_START_PATTERN);
+    QRegularExpression portSectionStartRegex(PORT_SECTION_START_PATTERN);
+    QRegularExpression genericSectionEndRegex(GENERIC_OR_PORT_SECTION_END_PATTERN);
     QRegularExpressionMatch ms;
     QRegularExpressionMatch me;
+    QRegularExpressionMatch gs;
+    QRegularExpressionMatch ps;
 
     do
     {
         ms = entityStartRegex.match(text, entityStart);
         if (ms.hasMatch())
         {
+            entityStart = ms.capturedEnd();
             QString entityName = ms.captured("name");
             QRegularExpression entityEndRegex(ENTITY_END_PATTERN.arg(entityName));
             me = entityEndRegex.match(text, ms.capturedStart() + ms.capturedLength());
             if (me.hasMatch())
             {
+                entityStart = me.capturedEnd();
+
+                DependencyParserEntityDefinition x(entityName);
+
                 QString entityDeclaration = text.mid(ms.capturedStart(), me.capturedEnd() - ms.capturedStart());
-                qDebug() << entityDeclaration;
+
+                gs = genericSectionStartRegex.match(entityDeclaration);
+                ps = portSectionStartRegex.match(entityDeclaration);
+                if (gs.hasMatch())
+                {
+                    if (ps.hasMatch())
+                    {
+                        x.mGenerics = DependencyParserGenericDefinition::parseText(entityDeclaration.mid(gs.capturedEnd(), ps.capturedStart() - gs.capturedEnd()));
+                    }
+                    else
+                    {
+                        x.mGenerics = DependencyParserGenericDefinition::parseText(entityDeclaration.mid(gs.capturedEnd(), me.capturedStart() - gs.capturedEnd()));
+                    }
+                }
+
+                if (ps.hasMatch())
+                {
+                    x.mPorts = DependencyParserPortDefinition::parseText(entityDeclaration.mid(ps.capturedEnd(), me.capturedStart() - ps.capturedEnd()));
+                }
+
+                e.append(x);
             }
         }
 

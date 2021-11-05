@@ -9,13 +9,15 @@
 #include <QJsonArray>
 #include <QFile>
 #include <QDebug>
-
+#include "dependencyparserentitydefinition.h"
 
 UnitTestDependencyParserDialog::UnitTestDependencyParserDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::UnitTestDependencyParserDialog)
 {
     ui->setupUi(this);
+
+    connect(ui->runButton, &QPushButton::clicked, this, &UnitTestDependencyParserDialog::runTests);
 
     QDir dependencyParserTestDir(QCoreApplication::applicationDirPath() + QDir::separator() + ".." + QDir::separator() + "test" + QDir::separator() + "data" + QDir::separator() + "dependency_parser");
     QDirIterator expectIterator(dependencyParserTestDir.canonicalPath(), QStringList() << "*.json", QDir::Files, QDirIterator::Subdirectories);
@@ -257,4 +259,60 @@ UnitTestDependencyParserDialog::ExpectFile UnitTestDependencyParserDialog::parse
     }
 
     return expectFile;
+}
+
+void UnitTestDependencyParserDialog::runTests()
+{
+    for (auto& tc : mTestCases)
+    {
+        for (auto& tf : tc.testFiles)
+        {
+            QFile f(tf.filePath);
+            if (f.open(QIODevice::ReadOnly))
+            {
+                QString txt = f.readAll();
+                f.close();
+
+                ui->testResultsTextEdit->appendPlainText(QString("Parsing %1...").arg(tf.filePath));
+                QList<DependencyParserEntityDefinition> e = DependencyParserEntityDefinition::parseText(txt);
+
+                bool pass = true;
+                for (const auto& pe : e)
+                {
+                    ui->testResultsTextEdit->appendPlainText(QString("Found entity %1:").arg(pe.name()));
+                    ui->testResultsTextEdit->appendPlainText("\tGenerics:");
+                    for (const auto& g : pe.generics())
+                    {
+                        ui->testResultsTextEdit->appendPlainText(QString("\t\tname=%1, type=%2").arg(g.name(), g.type()));
+                    }
+                    ui->testResultsTextEdit->appendPlainText("\tPorts:");
+                    for (const auto& p : pe.ports())
+                    {
+                        ui->testResultsTextEdit->appendPlainText(QString("\t\tname=%1, direction=%2, type=%3").arg(p.name(), p.dirString(), p.type()));
+                    }
+                    bool found = false;
+                    for (const auto& ed : tc.expectFile.entityDefinitions)
+                    {
+                        if (pe.name() == ed.name)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found)
+                    {
+                        ui->testResultsTextEdit->appendPlainText(QString("Found entity %1 in the test file, but it was not expected.").arg(pe.name()));
+                        pass = false;
+                    }
+                }
+
+                tf.testRun = true;
+                tf.testPass = pass;
+                ui->testResultsTextEdit->appendPlainText("\n");
+            }
+        }
+    }
+
+    refreshTable();
 }

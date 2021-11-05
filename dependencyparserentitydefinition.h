@@ -38,7 +38,6 @@ private:
     static const QString PORT_SECTION_START_PATTERN;
     static const QString GENERIC_OR_PORT_SECTION_END_PATTERN;
 
-    QRegularExpression mEntityEndRegex();
     QString mName;
     QList<DependencyParserGenericDefinition> mGenerics;
     QList<DependencyParserPortDefinition> mPorts;
