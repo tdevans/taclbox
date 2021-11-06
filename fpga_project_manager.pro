@@ -9,20 +9,22 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    dependencyparserarchitecturedefinition.cpp \
-    dependencyparserentitydefinition.cpp \
-    dependencyparsergenericdefinition.cpp \
-    dependencyparserportdefinition.cpp \
+    hdlparserarchitecturedefinition.cpp \
+    hdlparserentitydefinition.cpp \
+    hdlparsergenericdefinition.cpp \
+    hdlparserportdefinition.cpp \
+    hdlparsersignaldefinition.cpp \
     main.cpp \
     mainwindow.cpp \
     unittestdependencyparserdialog.cpp \
     vhdldependencyparser.cpp
 
 HEADERS += \
-    dependencyparserarchitecturedefinition.h \
-    dependencyparserentitydefinition.h \
-    dependencyparsergenericdefinition.h \
-    dependencyparserportdefinition.h \
+    hdlparserarchitecturedefinition.h \
+    hdlparserentitydefinition.h \
+    hdlparsergenericdefinition.h \
+    hdlparserportdefinition.h \
+    hdlparsersignaldefinition.h \
     mainwindow.h \
     unittestdependencyparserdialog.h \
     vhdldependencyparser.h

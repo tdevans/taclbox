@@ -13,7 +13,7 @@ entity test_entity is
 	);
 end entity test_entity;
 
-architecture rtl of test_entity is
+architecture rtla of test_entity is
 
 	signal y : unsigned(3 downto 0);
 

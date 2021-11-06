@@ -1,25 +1,25 @@
-#include "dependencyparserportdefinition.h"
+#include "hdlparserportdefinition.h"
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <QRegularExpressionMatchIterator>
 #include <QDebug>
 
-const QString DependencyParserPortDefinition::PORT_PATTERN = "(?<name>[a-zA-Z][a-zA-Z0-9_]*)\\s*:\\s*(?<dir>in|out|inout)\\s+(?<type>[a-zA-Z][a-zA-Z0-9_\\s]*(?:\\([a-zA-Z0-9\\s]*\\))*)";
+const QString HdlParserPortDefinition::PORT_PATTERN = "(?<name>[a-zA-Z][a-zA-Z0-9_]*)\\s*:\\s*(?<dir>in|out|inout)\\s+(?<type>[a-zA-Z][a-zA-Z0-9_\\s]*(?:\\([a-zA-Z0-9\\s]*\\))*)";
 
-DependencyParserPortDefinition::DependencyParserPortDefinition()
+HdlParserPortDefinition::HdlParserPortDefinition()
 {
 
 }
 
-DependencyParserPortDefinition::DependencyParserPortDefinition(QString name, ePortDir dir, QString type)
+HdlParserPortDefinition::HdlParserPortDefinition(QString name, ePortDir dir, QString type)
     :mName(name), mDir(dir), mType(type)
 {
 
 }
 
-QList<DependencyParserPortDefinition> DependencyParserPortDefinition::parseText(QString text)
+QList<HdlParserPortDefinition> HdlParserPortDefinition::parseText(QString text)
 {
-    QList<DependencyParserPortDefinition> ports;
+    QList<HdlParserPortDefinition> ports;
 
     QRegularExpression portRegex(PORT_PATTERN);
     QRegularExpressionMatchIterator portMatches = portRegex.globalMatch(text);
@@ -29,7 +29,7 @@ QList<DependencyParserPortDefinition> DependencyParserPortDefinition::parseText(
         QRegularExpressionMatch m = portMatches.next();
         //qDebug() << QString("Found port %1").arg(m.captured("name"));
 
-        DependencyParserPortDefinition p;
+        HdlParserPortDefinition p;
         p.mName = m.captured("name");
         p.mType = m.captured("type");
 
@@ -57,7 +57,7 @@ QList<DependencyParserPortDefinition> DependencyParserPortDefinition::parseText(
     return ports;
 }
 
-bool DependencyParserPortDefinition::operator==(const DependencyParserPortDefinition &other)
+bool HdlParserPortDefinition::operator==(const HdlParserPortDefinition &other)
 {
     if ((other.mType == mType) && (other.mDir == mDir) && (other.mType == mType))
         return true;
@@ -65,22 +65,22 @@ bool DependencyParserPortDefinition::operator==(const DependencyParserPortDefini
         return false;
 }
 
-QString DependencyParserPortDefinition::name() const
+QString HdlParserPortDefinition::name() const
 {
     return mName;
 }
 
-void DependencyParserPortDefinition::setName(QString name)
+void HdlParserPortDefinition::setName(QString name)
 {
     mName = name;
 }
 
-ePortDir DependencyParserPortDefinition::dir() const
+ePortDir HdlParserPortDefinition::dir() const
 {
     return mDir;
 }
 
-QString DependencyParserPortDefinition::dirString() const
+QString HdlParserPortDefinition::dirString() const
 {
     switch (mDir)
     {
@@ -96,17 +96,17 @@ QString DependencyParserPortDefinition::dirString() const
     }
 }
 
-void DependencyParserPortDefinition::setDir(ePortDir dir)
+void HdlParserPortDefinition::setDir(ePortDir dir)
 {
     mDir = dir;
 }
 
-QString DependencyParserPortDefinition::type() const
+QString HdlParserPortDefinition::type() const
 {
     return mType;
 }
 
-void DependencyParserPortDefinition::setType(QString type)
+void HdlParserPortDefinition::setType(QString type)
 {
     mType = type;
 }

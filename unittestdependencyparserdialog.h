@@ -86,11 +86,20 @@ private:
 
     QList<TestCase> mTestCases;
 
+    // Used to pass context menu information to slots
+    int ctxTestCase;
+    int ctxTestFile;
+
     void refreshTable();
     ExpectFile parseExpectFile(QString filePath);
+    void runTestCase(TestCase& tc);
+    void runTestFile(TestFile& tf, ExpectFile& ef);
 
 private slots:
     void runTests();
+    void runTestCaseFromContextMenu();
+    void runTestFileFromContextMenu();
+    void getTreeContextMenu(const QPoint& pos);
 };
 
 #endif // UNITTESTDEPENDENCYPARSERDIALOG_H
