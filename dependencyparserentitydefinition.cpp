@@ -3,7 +3,7 @@
 #include <QDebug>
 
 const QString DependencyParserEntityDefinition::ENTITY_START_PATTERN = "entity\\s+(?<name>[a-zA-Z]\\w*)\\s+is"; // Capture group grabs the entity name
-const QString DependencyParserEntityDefinition::ENTITY_END_PATTERN = "end\\s+(?:entity\\s+)%1;"; // Make entity name variable here, to be filled in when we start the entity
+const QString DependencyParserEntityDefinition::ENTITY_END_PATTERN = "end\\s+(?:entity\\s+)?%1;"; // Make entity name variable here, to be filled in when we start the entity
 const QString DependencyParserEntityDefinition::GENERIC_SECTION_START_PATTERN = "generic\\s*\\(";
 const QString DependencyParserEntityDefinition::PORT_SECTION_START_PATTERN = "port\\s*\\(";
 const QString DependencyParserEntityDefinition::GENERIC_OR_PORT_SECTION_END_PATTERN = "\\);";

@@ -8,8 +8,11 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QFile>
+#include <QBrush>
+#include <QColor>
 #include <QDebug>
 #include "dependencyparserentitydefinition.h"
+#include "dependencyparserarchitecturedefinition.h"
 
 UnitTestDependencyParserDialog::UnitTestDependencyParserDialog(QWidget *parent) :
     QDialog(parent),
@@ -64,26 +67,29 @@ void UnitTestDependencyParserDialog::refreshTable()
 
         for (const auto& tf : tc.testFiles)
         {
-            QStringList cols;
+            QTreeWidgetItem* t = new QTreeWidgetItem();
 
-            cols << tf.filePath;
+            t->setText(0, tf.filePath);
+
             if (tf.testRun)
             {
                 if (tf.testPass)
                 {
-                    cols << "PASS";
+                    t->setText(1, "PASS");
+                    t->setForeground(1, QBrush(Qt::green));
                 }
                 else
                 {
-                    cols << "FAIL";
+                    t->setText(1, "FAIL");
+                    t->setForeground(1, QBrush(Qt::red));
                 }
             }
             else
             {
-                cols << "-";
+                t->setText(1, "-");
+                t->setForeground(1, QBrush(Qt::black));
             }
 
-            QTreeWidgetItem* t = new QTreeWidgetItem(cols);
             e->addChild(t);
         }
 
@@ -274,9 +280,14 @@ void UnitTestDependencyParserDialog::runTests()
                 f.close();
 
                 ui->testResultsTextEdit->appendPlainText(QString("Parsing %1...").arg(tf.filePath));
+
+                // We'll set this to fail if any of the individual tests fails
+                bool pass = true;
+
+                // Parse the file to get the entities it defines
                 QList<DependencyParserEntityDefinition> e = DependencyParserEntityDefinition::parseText(txt);
 
-                bool pass = true;
+                // Check that all the entities we find are in the list of entities we expected to find
                 for (const auto& pe : e)
                 {
                     ui->testResultsTextEdit->appendPlainText(QString("Found entity %1:").arg(pe.name()));
@@ -302,7 +313,72 @@ void UnitTestDependencyParserDialog::runTests()
 
                     if (!found)
                     {
-                        ui->testResultsTextEdit->appendPlainText(QString("Found entity %1 in the test file, but it was not expected.").arg(pe.name()));
+                        ui->testResultsTextEdit->appendHtml(QString("<span style=\"color: red;\">Error: Found entity %1 in the test file, but it was not expected.</span>").arg(pe.name()));
+                        pass = false;
+                    }
+                }
+
+                // Check that we found all the entities we expected to find
+                for (const auto& ed : tc.expectFile.entityDefinitions)
+                {
+                    bool found = false;
+                    for (const auto& pe : e)
+                    {
+                        if (pe.name() == ed.name)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found)
+                    {
+                        ui->testResultsTextEdit->appendHtml(QString("<span style=\"color: red;\">Error: Did not find expected entity %1.</span>").arg(ed.name));
+                        pass = false;
+                    }
+                }
+
+
+                // Parse the file to get the architectures it defines
+                QList<DependencyParserArchitectureDefinition> a = DependencyParserArchitectureDefinition::parseText(txt);
+
+                // Make sure all the architectures we find in the file are ones we expected
+                for (const auto& pa : a)
+                {
+                    ui->testResultsTextEdit->appendPlainText(QString("Found architecture %1 for entity %2:").arg(pa.name(), pa.entityName()));
+                    bool found = false;
+                    for (const auto& ad : tc.expectFile.architectureDefinitions)
+                    {
+                        if ((pa.name() == ad.name) && (pa.entityName() == ad.entityName))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found)
+                    {
+                        ui->testResultsTextEdit->appendHtml(QString("<span style=\"color: red\">Error: Found architecture %1 for entity %2 in the test file, but it was not expected.</span>").arg(pa.name(), pa.entityName()));
+                        pass = false;
+                    }
+                }
+
+                // Make sure we found all the architectures we were expecting to find
+                for (const auto& ad : tc.expectFile.architectureDefinitions)
+                {
+                    bool found = false;
+                    for (const auto& pa : a)
+                    {
+                        if ((pa.name() == ad.name) && (pa.entityName() == ad.entityName))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found)
+                    {
+                        ui->testResultsTextEdit->appendHtml(QString("<span style=\"color: red\">Error: Did not find expected architecture %1 for entity %2.</span>").arg(ad.name, ad.entityName));
                         pass = false;
                     }
                 }
