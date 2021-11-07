@@ -14,9 +14,10 @@ SOURCES += \
     hdlparsergenericdefinition.cpp \
     hdlparserportdefinition.cpp \
     hdlparsersignaldefinition.cpp \
+    hdlparsertypedefinition.cpp \
     main.cpp \
     mainwindow.cpp \
-    unittestdependencyparserdialog.cpp \
+    unittesthdlparserdialog.cpp \
     vhdldependencyparser.cpp
 
 HEADERS += \
@@ -25,8 +26,9 @@ HEADERS += \
     hdlparsergenericdefinition.h \
     hdlparserportdefinition.h \
     hdlparsersignaldefinition.h \
+    hdlparsertypedefinition.h \
     mainwindow.h \
-    unittestdependencyparserdialog.h \
+    unittesthdlparserdialog.h \
     vhdldependencyparser.h
 
 # Default rules for deployment.
@@ -36,7 +38,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 FORMS += \
     mainwindow.ui \
-    unittestdependencyparserdialog.ui
+    unittesthdlparserdialog.ui
 
 test_data.path = $${OUT_PWD}/test
 test_data.files += test/*

@@ -1,0 +1,82 @@
+{
+	"defines" : {
+		"entity" : [
+		],
+		"architecture" : [
+			{
+				"name" : "rtl",
+				"entity" : "test_entity",
+				"types" : [
+					{
+						"name" : "t_percent",
+						"enum" : [
+						],
+						"range" : {
+							"left" : 0,
+							"right" : 100,
+							"descending" : false
+						}
+					},
+					{
+						"name" : "t_myint",
+						"enum": [
+						],
+						"range" : {
+							"left" : 2047,
+							"right" : -2048,
+							"descending" : true
+						}
+					},
+					{
+						"name" : "t_myfloat_normal",
+						"enum" : [
+						],
+						"range" : {
+							"left" : 0.0,
+							"right" : 106.71,
+							"descending" : false
+						}
+					},
+					{
+						"name" : "t_myfloat_scientific",
+						"enum" : [
+						],
+						"range" : {
+							"left" : -1.0e6,
+							"right" : 3.14e5,
+							"descending" : false
+						}
+					},
+					{
+						"name" : "t_myfloat_scientific_negex",
+						"enum" : [
+						],
+						"range" : {
+							"left" : -1.0e-2,
+							"right" : 1.0e-2,
+							"descending" : false
+						}
+					}
+				],
+				"signals" : [
+					{"name" : "progress", "type" : "t_percent"}
+				]
+			}
+		],
+		"packageHeader" : [
+		],
+		"packageBody" : [
+		]
+	},
+	"depends" : {
+		"library" : [
+			{"name" : "ieee"}
+		],
+		"package" : [
+			{"name" : "std_logic_1164", "library" : "ieee"},
+			{"name" : "numeric_std", "library" : "ieee"}
+		],
+		"module" : [
+		]
+	}
+}

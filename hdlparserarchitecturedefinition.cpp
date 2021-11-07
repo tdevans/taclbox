@@ -40,6 +40,13 @@ QList<HdlParserArchitectureDefinition> HdlParserArchitectureDefinition::parseTex
                 architectureStart = me.capturedEnd();
 
                 HdlParserArchitectureDefinition x(architectureName, architectureEntityName);
+
+                // Get things that are inside the architecture
+                QString architectureText = text.mid(ms.capturedEnd(), me.capturedStart() - ms.capturedEnd());
+
+                x.mTypes = HdlParserTypeDefinition::parseText(architectureText);
+                x.mSigs = HdlParserSignalDefinition::parseText(architectureText);
+
                 architectures.append(x);
             }
         }
@@ -67,4 +74,40 @@ QString HdlParserArchitectureDefinition::entityName() const
 void HdlParserArchitectureDefinition::setEntityName(QString entityName)
 {
     mEntityName = entityName;
+}
+
+QList<HdlParserTypeDefinition> HdlParserArchitectureDefinition::types() const
+{
+    return mTypes;
+}
+
+void HdlParserArchitectureDefinition::addType(HdlParserTypeDefinition t)
+{
+    if (!mTypes.contains(t))
+    {
+        mTypes.append(t);
+    }
+}
+
+void HdlParserArchitectureDefinition::removeType(HdlParserTypeDefinition t)
+{
+    mTypes.removeAll(t);
+}
+
+QList<HdlParserSignalDefinition> HdlParserArchitectureDefinition::sigs() const
+{
+    return mSigs;
+}
+
+void HdlParserArchitectureDefinition::addSig(HdlParserSignalDefinition sig)
+{
+    if (!mSigs.contains(sig))
+    {
+        mSigs.append(sig);
+    }
+}
+
+void HdlParserArchitectureDefinition::removeSig(HdlParserSignalDefinition sig)
+{
+    mSigs.removeAll(sig);
 }

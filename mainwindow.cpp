@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "unittestdependencyparserdialog.h"
+#include "unittesthdlparserdialog.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -18,6 +18,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::openUnitTestDependencyParser()
 {
-    UnitTestDependencyParserDialog* u = new UnitTestDependencyParserDialog(this);
+    UnitTestHdlParserDialog* u = new UnitTestHdlParserDialog(this);
+    u->setAttribute(Qt::WA_DeleteOnClose);
     u->show();
 }

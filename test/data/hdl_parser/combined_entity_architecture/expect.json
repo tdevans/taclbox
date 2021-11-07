@@ -1,0 +1,43 @@
+{
+	"defines" : {
+		"entity" : [
+			{
+				"name" : "test_entity",
+				"generics" : [
+				],
+				"ports" : [
+					{"name" : "i_clk", "dir" : "in", "type" : "std_logic"},
+					{"name" : "i_reset_n", "dir" : "in", "type" : "std_logic"},
+					{"name" : "i_a", "dir" : "in", "type" : "unsigned(3 downto 0)"},
+					{"name" : "i_b", "dir" : "in", "type" : "unsigned(3 downto 0)"},
+					{"name" : "i_ctrl", "dir" : "in", "type" : "std_logic"},
+					{"name" : "o_y", "dir" : "out", "type" : "unsigned(3 downto 0)"}
+				]
+			}
+		],
+		"architecture" : [
+			{
+				"name" : "rtl",
+				"entity" : "test_entity",
+				"signals" : [
+					{"name" : "y", "type" : "unsigned(3 downto 0)"}
+				]
+			}
+		],
+		"packageHeader" : [
+		],
+		"packageBody" : [
+		]
+	},
+	"depends" : {
+		"library" : [
+			{"name" : "ieee"}
+		],
+		"package" : [
+			{"name" : "std_logic_1164", "library" : "ieee"},
+			{"name" : "numeric_std", "library" : "ieee"}
+		],
+		"module" : [
+		]
+	}
+}

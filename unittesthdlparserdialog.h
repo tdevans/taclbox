@@ -1,33 +1,64 @@
-#ifndef UNITTESTDEPENDENCYPARSERDIALOG_H
-#define UNITTESTDEPENDENCYPARSERDIALOG_H
+#ifndef UNITTESTHDLPARSERDIALOG_H
+#define UNITTESTHDLPARSERDIALOG_H
 
 #include <QDialog>
 #include <QList>
+#include <QMap>
+#include <QTreeWidgetItem>
 
 namespace Ui {
-class UnitTestDependencyParserDialog;
+class UnitTestHdlParserDialog;
 }
 
-class UnitTestDependencyParserDialog : public QDialog
+class UnitTestHdlParserDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit UnitTestDependencyParserDialog(QWidget *parent = nullptr);
-    ~UnitTestDependencyParserDialog();
+    explicit UnitTestHdlParserDialog(QWidget *parent = nullptr);
+    ~UnitTestHdlParserDialog();
 
 private:
-    Ui::UnitTestDependencyParserDialog *ui;
+    Ui::UnitTestHdlParserDialog *ui;
+
+    struct ExpectFileGenericDefinition
+    {
+        QString name;
+        QString type;
+    };
+
+    struct ExpectFilePortDefinition
+    {
+        QString name;
+        QString dir;
+        QString type;
+    };
 
     struct ExpectFileEntityDefinition
     {
         QString name;
+        QList<ExpectFileGenericDefinition> generics;
+        QList<ExpectFilePortDefinition> ports;
+    };
+
+    struct ExpectFileTypeDefinition
+    {
+        QString name;
+        QStringList enumValues;
+    };
+
+    struct ExpectFileSignalDefinition
+    {
+        QString name;
+        QString typeName;
     };
 
     struct ExpectFileArchitectureDefinition
     {
         QString name;
         QString entityName;
+        QList<ExpectFileTypeDefinition> types;
+        QList<ExpectFileSignalDefinition> sigs;
     };
 
     struct ExpectFilePackageHeaderDefinition
@@ -62,6 +93,7 @@ private:
     struct ExpectFile
     {
         QString filePath;
+        bool parseError;
         QList<ExpectFileEntityDefinition> entityDefinitions;
         QList<ExpectFileArchitectureDefinition> architectureDefinitions;
         QList<ExpectFilePackageHeaderDefinition> packageHeaderDefinitions;
@@ -102,4 +134,4 @@ private slots:
     void getTreeContextMenu(const QPoint& pos);
 };
 
-#endif // UNITTESTDEPENDENCYPARSERDIALOG_H
+#endif // UNITTESTHDLPARSERDIALOG_H

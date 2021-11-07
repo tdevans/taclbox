@@ -10,7 +10,7 @@ public:
     HdlParserSignalDefinition();
     HdlParserSignalDefinition(QString name, QString typeName);
 
-    QList<HdlParserSignalDefinition> parseText(QString text);
+    static QList<HdlParserSignalDefinition> parseText(QString text);
 
     bool operator==(const HdlParserSignalDefinition& other);
 

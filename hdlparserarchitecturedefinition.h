@@ -3,6 +3,8 @@
 
 #include <QString>
 #include <QList>
+#include "hdlparsertypedefinition.h"
+#include "hdlparsersignaldefinition.h"
 
 class HdlParserArchitectureDefinition
 {
@@ -18,12 +20,23 @@ public:
     QString entityName() const;
     void setEntityName(QString entityName);
 
+    QList<HdlParserTypeDefinition> types() const;
+    void addType(HdlParserTypeDefinition t);
+    void removeType(HdlParserTypeDefinition t);
+
+    QList<HdlParserSignalDefinition> sigs() const;
+    void addSig(HdlParserSignalDefinition sig);
+    void removeSig(HdlParserSignalDefinition sig);
+
+
 private:
     static const QString ARCHITECTURE_START_PATTERN;
     static const QString ARCHITECTURE_END_PATTERN;
 
     QString mName;
     QString mEntityName;
+    QList<HdlParserTypeDefinition> mTypes;
+    QList<HdlParserSignalDefinition> mSigs;
 
 };
 

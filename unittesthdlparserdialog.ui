@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>UnitTestDependencyParserDialog</class>
- <widget class="QDialog" name="UnitTestDependencyParserDialog">
+ <class>UnitTestHdlParserDialog</class>
+ <widget class="QDialog" name="UnitTestHdlParserDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -66,7 +66,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::Close</set>
      </property>
     </widget>
    </item>
@@ -77,7 +77,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>UnitTestDependencyParserDialog</receiver>
+   <receiver>UnitTestHdlParserDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -93,7 +93,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>UnitTestDependencyParserDialog</receiver>
+   <receiver>UnitTestHdlParserDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
