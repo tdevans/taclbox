@@ -450,12 +450,12 @@ void UnitTestHdlParserDialog::runTestFile(TestFile& tf, ExpectFile& ef)
         bool pass = true;
 
         // Parse the file to get the entities it defines
-        QList<HdlParserEntityDefinition> e = HdlParserEntityDefinition::parseText(txt);
+        QList<HdlParserEntityDefinition> e = HdlParserEntityDefinition::parseText(QStringRef(&txt), tf.filePath, 1);
 
         // Check that all the entities we find are in the list of entities we expected to find
         for (const auto& pe : e)
         {
-            ui->testResultsTextEdit->appendPlainText(QString("Found entity %1:").arg(pe.name()));
+            ui->testResultsTextEdit->appendPlainText(QString("Found entity %1 on line %2").arg(pe.name()).arg(pe.lineNum()));
 
             // Make sure this entity is supposed to exist
             bool entityFound = false;
@@ -480,7 +480,7 @@ void UnitTestHdlParserDialog::runTestFile(TestFile& tf, ExpectFile& ef)
             ui->testResultsTextEdit->appendPlainText("\tGenerics:");
             for (const auto& g : pe.generics())
             {
-                ui->testResultsTextEdit->appendPlainText(QString("\t\tname=%1, type=%2").arg(g.name(), g.type()));
+                ui->testResultsTextEdit->appendPlainText(QString("\t\tname=%1, type=%2 @ line=%3").arg(g.name(), g.type()).arg(g.lineNum()));
                 if (entityFound)
                 {
                     bool genericFound = false;
@@ -527,7 +527,7 @@ void UnitTestHdlParserDialog::runTestFile(TestFile& tf, ExpectFile& ef)
             // Make sure the ports we found are expected
             for (const auto& p : pe.ports())
             {
-                ui->testResultsTextEdit->appendPlainText(QString("\t\tname=%1, direction=%2, type=%3").arg(p.name(), p.dirString(), p.type()));
+                ui->testResultsTextEdit->appendPlainText(QString("\t\tname=%1, direction=%2, type=%3 @ line=%4").arg(p.name(), p.dirString(), p.type()).arg(p.lineNum()));
 
                 if (entityFound)
                 {
@@ -593,12 +593,12 @@ void UnitTestHdlParserDialog::runTestFile(TestFile& tf, ExpectFile& ef)
 
 
         // Parse the file to get the architectures it defines
-        QList<HdlParserArchitectureDefinition> a = HdlParserArchitectureDefinition::parseText(txt);
+        QList<HdlParserArchitectureDefinition> a = HdlParserArchitectureDefinition::parseText(QStringRef(&txt), tf.filePath, 1);
 
         // Make sure all the architectures we find in the file are ones we expected
         for (const auto& pa : a)
         {
-            ui->testResultsTextEdit->appendPlainText(QString("Found architecture %1 for entity %2:").arg(pa.name(), pa.entityName()));
+            ui->testResultsTextEdit->appendPlainText(QString("Found architecture %1 for entity %2 at line %3").arg(pa.name(), pa.entityName()).arg(pa.lineNum()));
             bool architectureFound = false;
             const ExpectFileArchitectureDefinition* matchingArchitecture;
             for (const auto& ad : ef.architectureDefinitions)
@@ -624,7 +624,7 @@ void UnitTestHdlParserDialog::runTestFile(TestFile& tf, ExpectFile& ef)
                 switch (t.category())
                 {
                 case HdlParserTypeDefinition::ENUM:
-                    ui->testResultsTextEdit->appendPlainText(QString("\t\tname=%1, enum=").arg(t.name()));
+                    ui->testResultsTextEdit->appendPlainText(QString("\t\tname=%1, enum= @ line=%2").arg(t.name()).arg(t.lineNum()));
                     for (const auto& e : t.enumValues())
                     {
                         ui->testResultsTextEdit->appendPlainText(QString("\t\t\t%1").arg(e));
@@ -632,7 +632,7 @@ void UnitTestHdlParserDialog::runTestFile(TestFile& tf, ExpectFile& ef)
                     break;
 
                 case HdlParserTypeDefinition::SCALAR:
-                    ui->testResultsTextEdit->appendPlainText(QString("\t\tname=%1, left=%2, right=%3, descending=%4").arg(t.name()).arg(t.rangeLeft()).arg(t.rangeRight()).arg(t.rangeDescending()));
+                    ui->testResultsTextEdit->appendPlainText(QString("\t\tname=%1, left=%2, right=%3, descending=%4 @ line=%5").arg(t.name()).arg(t.rangeLeft()).arg(t.rangeRight()).arg(t.rangeDescending()).arg(t.lineNum()));
                     break;
                 }
 
@@ -680,7 +680,7 @@ void UnitTestHdlParserDialog::runTestFile(TestFile& tf, ExpectFile& ef)
             ui->testResultsTextEdit->appendPlainText("\tSignals:");
             for (const auto& s : pa.sigs())
             {
-                ui->testResultsTextEdit->appendPlainText(QString("\t\tname=%1, type=%2").arg(s.name(), s.typeName()));
+                ui->testResultsTextEdit->appendPlainText(QString("\t\tname=%1, type=%2 @ line=%3").arg(s.name(), s.typeName()).arg(s.lineNum()));
                 if (architectureFound)
                 {
                     bool signalFound = false;

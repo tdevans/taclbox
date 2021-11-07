@@ -1,0 +1,40 @@
+{
+	"defines" : {
+		"entity" : [
+		],
+		"architecture" : [
+			{
+				"name" : "rtl",
+				"entity" : "test_entity",
+				"types" : [
+					{
+						"name" : "t_state",
+						"enum" : [
+							"s_idle",
+							"s_active",
+							"s_wait"
+						]
+					}
+				],
+				"signals" : [
+					{"name" : "state", "type" : "t_state"}
+				]
+			}
+		],
+		"packageHeader" : [
+		],
+		"packageBody" : [
+		]
+	},
+	"depends" : {
+		"library" : [
+			{"name" : "ieee"}
+		],
+		"package" : [
+			{"name" : "std_logic_1164", "library" : "ieee"},
+			{"name" : "numeric_std", "library" : "ieee"}
+		],
+		"module" : [
+		]
+	}
+}

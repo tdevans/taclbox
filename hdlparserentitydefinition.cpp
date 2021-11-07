@@ -20,7 +20,7 @@ HdlParserEntityDefinition::HdlParserEntityDefinition(QString name)
 
 }
 
-QList<HdlParserEntityDefinition> HdlParserEntityDefinition::parseText(QString text)
+QList<HdlParserEntityDefinition> HdlParserEntityDefinition::parseText(const QStringRef text, QString filePath, int startingLine)
 {
     QList<HdlParserEntityDefinition> e;
 
@@ -49,7 +49,11 @@ QList<HdlParserEntityDefinition> HdlParserEntityDefinition::parseText(QString te
 
                 HdlParserEntityDefinition x(entityName);
 
-                QString entityDeclaration = text.mid(ms.capturedStart(), me.capturedEnd() - ms.capturedStart());
+                x.mFilePath = filePath;
+                x.mLineNum = startingLine + text.left(ms.capturedStart()).count('\n');
+
+                const QStringRef entityDeclaration = text.mid(ms.capturedStart(), me.capturedEnd() - ms.capturedStart());
+                int entityDeclarationLine = startingLine + text.left(ms.capturedStart()).count('\n');
 
                 gs = genericSectionStartRegex.match(entityDeclaration);
                 ps = portSectionStartRegex.match(entityDeclaration);
@@ -57,17 +61,23 @@ QList<HdlParserEntityDefinition> HdlParserEntityDefinition::parseText(QString te
                 {
                     if (ps.hasMatch())
                     {
-                        x.mGenerics = HdlParserGenericDefinition::parseText(entityDeclaration.mid(gs.capturedEnd(), ps.capturedStart() - gs.capturedEnd()));
+                        const QStringRef genericSection = entityDeclaration.mid(gs.capturedEnd(), ps.capturedStart() - gs.capturedEnd());
+                        int genericSectionLine = entityDeclarationLine + entityDeclaration.left(gs.capturedEnd()).count('\n');
+                        x.mGenerics = HdlParserGenericDefinition::parseText(genericSection, filePath, genericSectionLine);
                     }
                     else
                     {
-                        x.mGenerics = HdlParserGenericDefinition::parseText(entityDeclaration.mid(gs.capturedEnd(), me.capturedStart() - gs.capturedEnd()));
+                        const QStringRef genericSection = entityDeclaration.mid(gs.capturedEnd(), me.capturedStart() - gs.capturedEnd());
+                        int genericSectionLine = entityDeclarationLine + entityDeclaration.left(gs.capturedEnd()).count('\n');
+                        x.mGenerics = HdlParserGenericDefinition::parseText(genericSection, filePath, genericSectionLine);
                     }
                 }
 
                 if (ps.hasMatch())
                 {
-                    x.mPorts = HdlParserPortDefinition::parseText(entityDeclaration.mid(ps.capturedEnd(), me.capturedStart() - ps.capturedEnd()));
+                    const QStringRef portSection = entityDeclaration.mid(ps.capturedEnd(), me.capturedStart() - ps.capturedEnd());
+                    int portSectionLine = entityDeclarationLine + entityDeclaration.left(ps.capturedEnd()).count('\n');
+                    x.mPorts = HdlParserPortDefinition::parseText(portSection, filePath, portSectionLine);
                 }
 
                 e.append(x);
@@ -88,6 +98,16 @@ QString HdlParserEntityDefinition::name() const
 void HdlParserEntityDefinition::setName(QString n)
 {
     mName = n;
+}
+
+QString HdlParserEntityDefinition::filePath() const
+{
+    return mFilePath;
+}
+
+int HdlParserEntityDefinition::lineNum() const
+{
+    return mLineNum;
 }
 
 QList<HdlParserGenericDefinition> HdlParserEntityDefinition::generics() const

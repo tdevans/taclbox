@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QStringList>
+#include <QStringRef>
 #include <QList>
 
 class HdlParserTypeDefinition
@@ -13,7 +14,7 @@ public:
     HdlParserTypeDefinition();
     HdlParserTypeDefinition(QString name);
 
-    static QList<HdlParserTypeDefinition> parseText(QString text);
+    static QList<HdlParserTypeDefinition> parseText(const QStringRef text, QString filePath, int startingLine);
 
     bool operator==(const HdlParserTypeDefinition& other);
 
@@ -32,11 +33,17 @@ public:
     double rangeRight() const;
     bool rangeDescending() const;
 
+    QString filePath() const;
+
+    int lineNum() const;
+
 private:
     static const QString ENUM_PATTERN;
     static const QString SCALAR_PATTERN;
 
     QString mName;
+    QString mFilePath;
+    int mLineNum;
     TypeCategory mCateogry;
 
     QStringList mEnumValues;

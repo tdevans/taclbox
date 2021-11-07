@@ -16,7 +16,7 @@ HdlParserSignalDefinition::HdlParserSignalDefinition(QString name, QString typeN
 
 }
 
-QList<HdlParserSignalDefinition> HdlParserSignalDefinition::parseText(QString text)
+QList<HdlParserSignalDefinition> HdlParserSignalDefinition::parseText(const QStringRef text, QString filePath, int startingLine)
 {
     QList<HdlParserSignalDefinition> sigs;
 
@@ -37,6 +37,8 @@ QList<HdlParserSignalDefinition> HdlParserSignalDefinition::parseText(QString te
                 HdlParserSignalDefinition s;
                 s.mName = n.trimmed();
                 s.mTypeName = m.captured("type");
+                s.mFilePath = filePath;
+                s.mLineNum = startingLine + text.left(m.capturedStart()).count('\n');
                 sigs.append(s);
             }
         }
@@ -68,4 +70,14 @@ QString HdlParserSignalDefinition::typeName() const
 void HdlParserSignalDefinition::setTypeName(QString typeName)
 {
     mTypeName = typeName;
+}
+
+QString HdlParserSignalDefinition::filePath() const
+{
+    return mFilePath;
+}
+
+int HdlParserSignalDefinition::lineNum() const
+{
+    return mLineNum;
 }

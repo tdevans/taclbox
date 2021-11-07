@@ -16,7 +16,7 @@ HdlParserArchitectureDefinition::HdlParserArchitectureDefinition(QString name, Q
 
 }
 
-QList<HdlParserArchitectureDefinition> HdlParserArchitectureDefinition::parseText(QString text)
+QList<HdlParserArchitectureDefinition> HdlParserArchitectureDefinition::parseText(const QStringRef text, QString filePath, int startingLine)
 {
     QList<HdlParserArchitectureDefinition> architectures;
 
@@ -41,11 +41,16 @@ QList<HdlParserArchitectureDefinition> HdlParserArchitectureDefinition::parseTex
 
                 HdlParserArchitectureDefinition x(architectureName, architectureEntityName);
 
-                // Get things that are inside the architecture
-                QString architectureText = text.mid(ms.capturedEnd(), me.capturedStart() - ms.capturedEnd());
+                // Where did we find the architecture
+                int l = text.left(ms.capturedStart()).count('\n');
+                x.mLineNum = l + startingLine;
+                x.mFilePath = filePath;
 
-                x.mTypes = HdlParserTypeDefinition::parseText(architectureText);
-                x.mSigs = HdlParserSignalDefinition::parseText(architectureText);
+                // Get things that are inside the architecture
+                const QStringRef architectureText = text.mid(ms.capturedEnd(), me.capturedStart() - ms.capturedEnd());
+
+                x.mTypes = HdlParserTypeDefinition::parseText(architectureText, filePath, startingLine + text.left(ms.capturedEnd()).count('\n'));
+                x.mSigs = HdlParserSignalDefinition::parseText(architectureText, filePath, startingLine + text.left(ms.capturedEnd()).count('\n'));
 
                 architectures.append(x);
             }
@@ -74,6 +79,16 @@ QString HdlParserArchitectureDefinition::entityName() const
 void HdlParserArchitectureDefinition::setEntityName(QString entityName)
 {
     mEntityName = entityName;
+}
+
+QString HdlParserArchitectureDefinition::filePath() const
+{
+    return mFilePath;
+}
+
+int HdlParserArchitectureDefinition::lineNum() const
+{
+    return mLineNum;
 }
 
 QList<HdlParserTypeDefinition> HdlParserArchitectureDefinition::types() const

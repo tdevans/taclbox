@@ -17,7 +17,7 @@ HdlParserPortDefinition::HdlParserPortDefinition(QString name, ePortDir dir, QSt
 
 }
 
-QList<HdlParserPortDefinition> HdlParserPortDefinition::parseText(QString text)
+QList<HdlParserPortDefinition> HdlParserPortDefinition::parseText(const QStringRef text, QString filePath, int startingLine)
 {
     QList<HdlParserPortDefinition> ports;
 
@@ -32,6 +32,8 @@ QList<HdlParserPortDefinition> HdlParserPortDefinition::parseText(QString text)
         HdlParserPortDefinition p;
         p.mName = m.captured("name");
         p.mType = m.captured("type");
+        p.mFilePath = filePath;
+        p.mLineNum = startingLine + text.left(m.capturedStart()).count('\n');
 
         if (m.captured("dir").toLower() == "in")
         {
@@ -109,4 +111,14 @@ QString HdlParserPortDefinition::type() const
 void HdlParserPortDefinition::setType(QString type)
 {
     mType = type;
+}
+
+QString HdlParserPortDefinition::filePath() const
+{
+    return mFilePath;
+}
+
+int HdlParserPortDefinition::lineNum() const
+{
+    return mLineNum;
 }

@@ -12,13 +12,17 @@ public:
     HdlParserArchitectureDefinition();
     HdlParserArchitectureDefinition(QString name, QString entityName);
 
-    static QList<HdlParserArchitectureDefinition> parseText(QString text);
+    static QList<HdlParserArchitectureDefinition> parseText(const QStringRef text, QString filePath, int startingLine);
 
     QString name() const;
     void setName(QString name);
 
     QString entityName() const;
     void setEntityName(QString entityName);
+
+    QString filePath() const;
+
+    int lineNum() const;
 
     QList<HdlParserTypeDefinition> types() const;
     void addType(HdlParserTypeDefinition t);
@@ -35,6 +39,8 @@ private:
 
     QString mName;
     QString mEntityName;
+    int mLineNum;
+    QString mFilePath;
     QList<HdlParserTypeDefinition> mTypes;
     QList<HdlParserSignalDefinition> mSigs;
 

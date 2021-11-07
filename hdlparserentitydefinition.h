@@ -12,10 +12,14 @@ public:
     HdlParserEntityDefinition();
     HdlParserEntityDefinition(QString name);
 
-    static QList<HdlParserEntityDefinition> parseText(QString text);
+    static QList<HdlParserEntityDefinition> parseText(const QStringRef text, QString filePath, int startingLine);
 
     QString name() const;
     void setName(QString n);
+
+    QString filePath() const;
+
+    int lineNum() const;
 
     QList<HdlParserGenericDefinition> generics() const;
     void setGenerics(QList<HdlParserGenericDefinition> genericList);
@@ -39,6 +43,8 @@ private:
     static const QString GENERIC_OR_PORT_SECTION_END_PATTERN;
 
     QString mName;
+    QString mFilePath;
+    int mLineNum;
     QList<HdlParserGenericDefinition> mGenerics;
     QList<HdlParserPortDefinition> mPorts;
 

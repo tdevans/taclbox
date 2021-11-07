@@ -12,7 +12,7 @@ public:
     HdlParserPortDefinition();
     HdlParserPortDefinition(QString name, ePortDir dir, QString type);
 
-    static QList<HdlParserPortDefinition> parseText(QString text);
+    static QList<HdlParserPortDefinition> parseText(const QStringRef text, QString filePath, int startingLine);
 
     bool operator==(const HdlParserPortDefinition& other);
 
@@ -26,12 +26,18 @@ public:
     QString type() const;
     void setType(QString type);
 
+    QString filePath() const;
+
+    int lineNum() const;
+
 private:
     static const QString PORT_PATTERN;
 
     QString mName;
     ePortDir mDir;
     QString mType;
+    QString mFilePath;
+    int mLineNum;
 
 };
 

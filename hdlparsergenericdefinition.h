@@ -10,7 +10,7 @@ public:
     HdlParserGenericDefinition();
     HdlParserGenericDefinition(QString name, QString type);
 
-    static QList<HdlParserGenericDefinition> parseText(QString text);
+    static QList<HdlParserGenericDefinition> parseText(const QStringRef text, QString filePath, int startingLine);
 
     bool operator==(const HdlParserGenericDefinition& other);
 
@@ -20,11 +20,17 @@ public:
     QString type() const;
     void setType(QString type);
 
+    QString filePath() const;
+
+    int lineNum() const;
+
 private:
     static const QString GENERIC_PATTERN;
 
     QString mName;
     QString mType;
+    QString mFilePath;
+    int mLineNum;
 };
 
 #endif // HDLPARSERGENERICDEFINITION_H

@@ -17,7 +17,7 @@ HdlParserGenericDefinition::HdlParserGenericDefinition(QString name, QString typ
 
 }
 
-QList<HdlParserGenericDefinition> HdlParserGenericDefinition::parseText(QString text)
+QList<HdlParserGenericDefinition> HdlParserGenericDefinition::parseText(const QStringRef text, QString filePath, int startingLine)
 {
     QList<HdlParserGenericDefinition> generics;
 
@@ -32,6 +32,8 @@ QList<HdlParserGenericDefinition> HdlParserGenericDefinition::parseText(QString 
         HdlParserGenericDefinition g;
         g.mName = m.captured("name");
         g.mType = m.captured("type");
+        g.mFilePath = filePath;
+        g.mLineNum = startingLine + text.left(m.capturedStart()).count('\n');
 
         generics.append(g);
     }
@@ -65,4 +67,14 @@ QString HdlParserGenericDefinition::type() const
 void HdlParserGenericDefinition::setType(QString type)
 {
     mType = type;
+}
+
+QString HdlParserGenericDefinition::filePath() const
+{
+    return mFilePath;
+}
+
+int HdlParserGenericDefinition::lineNum() const
+{
+    return mLineNum;
 }

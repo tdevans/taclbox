@@ -10,7 +10,7 @@ public:
     HdlParserSignalDefinition();
     HdlParserSignalDefinition(QString name, QString typeName);
 
-    static QList<HdlParserSignalDefinition> parseText(QString text);
+    static QList<HdlParserSignalDefinition> parseText(const QStringRef text, QString filePath, int startingLine);
 
     bool operator==(const HdlParserSignalDefinition& other);
 
@@ -20,11 +20,17 @@ public:
     QString typeName() const;
     void setTypeName(QString typeName);
 
+    QString filePath() const;
+
+    int lineNum() const;
+
 private:
     static const QString SIGNAL_PATTERN;
 
     QString mName;
     QString mTypeName;
+    QString mFilePath;
+    int mLineNum;
 };
 
 #endif // HDLPARSERSIGNALDEFINITION_H

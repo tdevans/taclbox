@@ -17,7 +17,7 @@ HdlParserTypeDefinition::HdlParserTypeDefinition(QString name)
 
 }
 
-QList<HdlParserTypeDefinition> HdlParserTypeDefinition::parseText(QString text)
+QList<HdlParserTypeDefinition> HdlParserTypeDefinition::parseText(const QStringRef text, QString filePath, int startingLine)
 {
     QList<HdlParserTypeDefinition> types;
 
@@ -30,6 +30,8 @@ QList<HdlParserTypeDefinition> HdlParserTypeDefinition::parseText(QString text)
         HdlParserTypeDefinition t;
         t.mName = m.captured("name");
         t.mCateogry = ENUM;
+        t.mFilePath = filePath;
+        t.mLineNum = startingLine + text.left(m.capturedStart()).count('\n');
 
         QStringList valList = m.captured("values").split(",");
         for (auto& v : valList)
@@ -50,6 +52,8 @@ QList<HdlParserTypeDefinition> HdlParserTypeDefinition::parseText(QString text)
         HdlParserTypeDefinition t;
         t.mName = m.captured("name");
         t.mCateogry = SCALAR;
+        t.mFilePath = filePath;
+        t.mLineNum = startingLine + text.left(m.capturedStart()).count('\n');
         t.mRangeLeft = m.captured("left").toDouble();
         t.mRangeRight = m.captured("right").toDouble();
         if (m.captured("dir") == "downto")
@@ -123,4 +127,14 @@ double HdlParserTypeDefinition::rangeRight() const
 bool HdlParserTypeDefinition::rangeDescending() const
 {
     return mRangeDescending;
+}
+
+QString HdlParserTypeDefinition::filePath() const
+{
+    return mFilePath;
+}
+
+int HdlParserTypeDefinition::lineNum() const
+{
+    return mLineNum;
 }
