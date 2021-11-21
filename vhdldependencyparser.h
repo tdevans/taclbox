@@ -11,7 +11,6 @@ public:
     explicit VhdlDependencyParser(QObject *parent = nullptr);
 
 
-
 signals:
 
 };

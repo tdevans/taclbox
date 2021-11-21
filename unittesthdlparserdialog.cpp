@@ -298,6 +298,49 @@ UnitTestHdlParserDialog::ExpectFile UnitTestHdlParserDialog::parseExpectFile(QSt
                                                         }
                                                     }
 
+                                                    if (j.contains("range") && j["range"].isObject())
+                                                    {
+                                                        QJsonObject l = j["range"].toObject();
+                                                        if (l.contains("left") && l["left"].isDouble() && l.contains("right") && l["right"].isDouble() && l.contains("descending") && l["descending"].isBool())
+                                                        {
+                                                            k.rangeLeft = l["left"].toDouble();
+                                                            k.rangeRight = l["right"].toDouble();
+                                                            k.rangeDescending = l["descending"].toBool();
+                                                        }
+                                                    }
+
+                                                    if (j.contains("arrayType") && j["arrayType"].isString() && j.contains("arrayDimensions") && j["arrayDimensions"].isArray())
+                                                    {
+                                                        k.arrayType = j["arrayType"].toString();
+                                                        QJsonArray l = j["arrayDimensions"].toArray();
+                                                        for (auto m : l)
+                                                        {
+                                                            if (m.isObject())
+                                                            {
+                                                                QJsonObject n = m.toObject();
+                                                                ExpectFileArrayRange r;
+                                                                if (n.contains("unconstrained") && n["unconstrained"].isBool())
+                                                                {
+                                                                    bool unconstrained = n["unconstrained"].toBool();
+                                                                    if (unconstrained && n.contains("type") && n["type"].isString())
+                                                                    {
+                                                                        r.unconstrained = unconstrained;
+                                                                        r.type = n["type"].toString();
+                                                                        k.arrayDimensions.append(r);
+                                                                    }
+                                                                    else if (!unconstrained && n.contains("rangeLeft") && n["rangeLeft"].isDouble() && n.contains("rangeRight") && n["rangeRight"].isDouble() && n.contains("rangeDescending") && n["rangeDescending"].isBool())
+                                                                    {
+                                                                        r.unconstrained = unconstrained;
+                                                                        r.left = n["rangeLeft"].toInt();
+                                                                        r.right = n["rangeRight"].toInt();
+                                                                        r.descending = n["rangeDescending"].toBool();
+                                                                        k.arrayDimensions.append(r);
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+
                                                     g.types.append(k);
                                                 }
                                             }
@@ -634,6 +677,20 @@ void UnitTestHdlParserDialog::runTestFile(TestFile& tf, ExpectFile& ef)
                 case HdlParserTypeDefinition::SCALAR:
                     ui->testResultsTextEdit->appendPlainText(QString("\t\tname=%1, left=%2, right=%3, descending=%4 @ line=%5").arg(t.name()).arg(t.rangeLeft()).arg(t.rangeRight()).arg(t.rangeDescending()).arg(t.lineNum()));
                     break;
+
+                case HdlParserTypeDefinition::ARRAY:
+                    ui->testResultsTextEdit->appendPlainText(QString("\t\tname=%1, type=%2, dimensions= @ line=%3").arg(t.name()).arg(t.arrayType()).arg(t.lineNum()));
+                    for (const auto& d : t.arrayDimensions())
+                    {
+                        if (d.unconstrained)
+                        {
+                            ui->testResultsTextEdit->appendPlainText(QString("\t\t\tunconstrained of type=%1").arg(d.typeName));
+                        }
+                        else
+                        {
+                            ui->testResultsTextEdit->appendPlainText(QString("\t\t\tleft=%1, right=%2, descending=%3").arg(d.rangeLeft).arg(d.rangeRight).arg(d.rangeDescending));
+                        }
+                    }
                 }
 
                 if (architectureFound)

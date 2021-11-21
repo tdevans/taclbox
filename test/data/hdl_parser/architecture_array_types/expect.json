@@ -1,0 +1,68 @@
+{
+	"defines" : {
+		"entity" : [
+		],
+		"architecture" : [
+			{
+				"name" : "rtl",
+				"entity" : "test_entity",
+				"types" : [
+					{
+						"name" : "t_slv8_vector",
+						"arrayDimensions" : [
+							{"unconstrained" : true, "type" : "natural"}
+						],
+						"arrayType" : "std_logic_vector( 7 downto 0)"
+					},
+					{
+						"name" : "t_mem",
+						"arrayType" : "std_logic_vector(63 downto 0)",
+						"arrayDimensions" : [
+							{"unconstrained" : false, "rangeLeft" : 63, "rangeRight" : 0, "rangeDescending" : true}
+						]
+					},
+					{
+						"name" : "t_unsigned_vector",
+						"arrayType" : "unsigned",
+						"arrayDimensions" : [
+							{"unconstrained" : true, "type" : "integer"}
+						]
+					},
+					{
+						"name" : "t_signed_matrix",
+						"arrayType" : "signed(7 downto 0)",
+						"arrayDimensions" : [
+							{"unconstrained" : true, "type" : "natural"},
+							{"unconstrained" : false, "rangeLeft" : 0, "rangeRight" : 15, "rangeDescending" : false}
+						]
+					},
+					{
+						"name" : "t_fixed_array",
+						"arrayType" : "fixed(7 downto -8)",
+						"arrayDimensions" : [
+							{"unconstrained" : false, "rangeLeft" : -10, "rangeRight" : 10, "rangeDescending" : false}
+						]
+					}
+				],
+				"signals" : [
+					{"name" : "bytes", "type" : "t_slv8_vector(0 to 63)"}
+				]
+			}
+		],
+		"packageHeader" : [
+		],
+		"packageBody" : [
+		]
+	},
+	"depends" : {
+		"library" : [
+			{"name" : "ieee"}
+		],
+		"package" : [
+			{"name" : "std_logic_1164", "library" : "ieee"},
+			{"name" : "numeric_std", "library" : "ieee"}
+		],
+		"module" : [
+		]
+	}
+}

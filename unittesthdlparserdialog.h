@@ -41,10 +41,24 @@ private:
         QList<ExpectFilePortDefinition> ports;
     };
 
+    struct ExpectFileArrayRange
+    {
+        bool unconstrained;
+        QString type;
+        int left;
+        int right;
+        bool descending;
+    };
+
     struct ExpectFileTypeDefinition
     {
         QString name;
         QStringList enumValues;
+        QString arrayType;
+        QList<ExpectFileArrayRange> arrayDimensions;
+        double rangeLeft;
+        double rangeRight;
+        bool rangeDescending;
     };
 
     struct ExpectFileSignalDefinition

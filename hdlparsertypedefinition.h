@@ -11,6 +11,15 @@ class HdlParserTypeDefinition
 public:
     enum TypeCategory {SCALAR, ENUM, PHYSICAL, ARRAY, STRUCT};
 
+    struct ArrayRange
+    {
+        bool unconstrained;
+        QString typeName;
+        int rangeLeft;
+        int rangeRight;
+        bool rangeDescending;
+    };
+
     HdlParserTypeDefinition();
     HdlParserTypeDefinition(QString name);
 
@@ -33,6 +42,9 @@ public:
     double rangeRight() const;
     bool rangeDescending() const;
 
+    QList<ArrayRange> arrayDimensions() const;
+    QString arrayType() const;
+
     QString filePath() const;
 
     int lineNum() const;
@@ -40,6 +52,9 @@ public:
 private:
     static const QString ENUM_PATTERN;
     static const QString SCALAR_PATTERN;
+    static const QString ARRAY_PATTERN;
+    static const QString UNCONSTRAINED_RANGE_PATTERN;
+    static const QString CONSTRAINED_RANGE_PATTERN;
 
     QString mName;
     QString mFilePath;
@@ -51,6 +66,9 @@ private:
     double mRangeLeft;
     double mRangeRight;
     bool mRangeDescending;
+
+    QList<ArrayRange> mArrayDimensions;
+    QString mArrayType;
 
 };
 
