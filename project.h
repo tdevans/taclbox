@@ -2,7 +2,6 @@
 #define PROJECT_H
 
 #include <QString>
-#include <QJsonObject>
 #include "semanticversion.h"
 
 class Project
@@ -10,20 +9,23 @@ class Project
 public:
     Project();
 
-    static Project load(QString projectFile);
-
-    bool save();
-    bool save(QString projectFile);
+    QString name() const;
+    void setName(QString name);
 
     SemanticVersion version() const;
     void setVersion(SemanticVersion version);
 
+    SemanticVersion taclVersion() const;
+    void setTaclVersion(SemanticVersion version);
+
+    QString file() const;
+    void setFile(QString filepath);
+
 private:
     QString mProjectFile;
-    SemanticVersion mVersion;
-
-    static SemanticVersion parseTaclVersion(QJsonObject prj);
-    static SemanticVersion parseProjectVersion(QJsonObject prj);
+    QString mName;
+    SemanticVersion mTaclVersion;
+    SemanticVersion mProjectVersion;
 };
 
 #endif // PROJECT_H

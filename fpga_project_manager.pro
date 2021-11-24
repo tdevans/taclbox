@@ -19,6 +19,7 @@ SOURCES += \
     mainwindow.cpp \
     project.cpp \
     projectmanager.cpp \
+    projectsummarywidget.cpp \
     semanticversion.cpp \
     unittesthdlparserdialog.cpp \
     vhdldependencyparser.cpp
@@ -30,10 +31,10 @@ HEADERS += \
     hdlparserportdefinition.h \
     hdlparsersignaldefinition.h \
     hdlparsertypedefinition.h \
-    invalidprojectfileexception.h \
     mainwindow.h \
     project.h \
     projectmanager.h \
+    projectsummarywidget.h \
     semanticversion.h \
     unittesthdlparserdialog.h \
     vhdldependencyparser.h

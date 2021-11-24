@@ -4,6 +4,7 @@
 		"minor" : 0,
 		"patch" : 0
 	},
+	"projectName" : "Test Project",
 	"projectVersion" : {
 		"major" : 1,
 		"minor" : 0,
