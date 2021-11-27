@@ -26,6 +26,7 @@ private:
     static const QString PORT_MAP_START_PATTERN;
     static const QString PORT_NAMED_ASSOC_PATTERN;
     static const QString PORT_POSITIONAL_ASSOC_PATTERN;
+    static const QString COMPONENT_INSTANTIATION_PATTERN;
 
     QString mInstanceName;
     QString mEntityName;

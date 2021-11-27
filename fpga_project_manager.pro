@@ -13,6 +13,7 @@ SOURCES += \
     hdlparserentitydefinition.cpp \
     hdlparsergenericdefinition.cpp \
     hdlparsermoduleinstantiation.cpp \
+    hdlparserpackageheaderdefinition.cpp \
     hdlparserportdefinition.cpp \
     hdlparsersignaldefinition.cpp \
     hdlparsertypedefinition.cpp \
@@ -32,6 +33,7 @@ HEADERS += \
     hdlparserentitydefinition.h \
     hdlparsergenericdefinition.h \
     hdlparsermoduleinstantiation.h \
+    hdlparserpackageheaderdefinition.h \
     hdlparserportdefinition.h \
     hdlparsersignaldefinition.h \
     hdlparsertypedefinition.h \
