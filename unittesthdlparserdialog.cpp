@@ -16,6 +16,7 @@
 #include <QDebug>
 #include "hdlparserentitydefinition.h"
 #include "hdlparserarchitecturedefinition.h"
+#include "hdlparsermoduleinstantiation.h"
 
 UnitTestHdlParserDialog::UnitTestHdlParserDialog(QWidget *parent) :
     QDialog(parent),
@@ -774,6 +775,50 @@ void UnitTestHdlParserDialog::runTestFile(TestFile& tf, ExpectFile& ef)
             if (!architectureFound)
             {
                 ui->testResultsTextEdit->appendHtml(QString("<span style=\"color: red\">Error: Did not find expected architecture %1 for entity %2.</span>").arg(ad.name, ad.entityName));
+                pass = false;
+            }
+        }
+
+
+        // Make sure all the module isntantiations we found were ones we were expecting
+        ui->testResultsTextEdit->appendPlainText(QString("\tDepends on Modules:"));
+        QList<HdlParserModuleInstantiation> parsedModules = HdlParserModuleInstantiation::parseText(QStringRef(&txt), tf.filePath, 1);
+        for (const auto& parsedModule : parsedModules)
+        {
+            ui->testResultsTextEdit->appendPlainText(QString("\t\t@line=%1: entity=%2, inst=%3, lib=%4, arch=%5").arg(parsedModule.lineNum()).arg(parsedModule.entityName(), parsedModule.instanceName(), parsedModule.libraryName(), parsedModule.architectureName()));
+            bool foundModule = false;
+            for (const auto& expectedModule : ef.moduleDependencies)
+            {
+                if ((parsedModule.instanceName() == expectedModule.instanceName) && (parsedModule.libraryName() == expectedModule.libraryName) && (parsedModule.entityName() == expectedModule.entityName) && (parsedModule.architectureName() == expectedModule.architectureName))
+                {
+                    foundModule = true;
+                    break;
+                }
+            }
+
+            if (!foundModule)
+            {
+                ui->testResultsTextEdit->appendHtml(QString("<span style=\"color: red\">Error: Found entity instantiation instName = %1, libraryName = %2, entityName = %3, architectureName = %4, but it was not expected.</span>").arg(parsedModule.instanceName(), parsedModule.libraryName(), parsedModule.entityName(), parsedModule.architectureName()));
+                pass = false;
+            }
+        }
+
+        // Make sure we found all of the modules we were expecting to find
+        for (const auto& expectedModule : ef.moduleDependencies)
+        {
+            bool foundModule = false;
+            for (const auto& parsedModule : parsedModules)
+            {
+                if ((parsedModule.instanceName() == expectedModule.instanceName) && (parsedModule.libraryName() == expectedModule.libraryName) && (parsedModule.entityName() == expectedModule.entityName) && (parsedModule.architectureName() == expectedModule.architectureName))
+                {
+                    foundModule = true;
+                    break;
+                }
+            }
+
+            if (!foundModule)
+            {
+                ui->testResultsTextEdit->appendHtml(QString("<span style=\"color: red\">Error: Unable to locate entity instantiation instName = %1, libraryName = %2, entityName = %3, architectureName = %4, but it was not expected.</span>").arg(expectedModule.instanceName, expectedModule.libraryName, expectedModule.entityName, expectedModule.architectureName));
                 pass = false;
             }
         }

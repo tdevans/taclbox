@@ -2,6 +2,7 @@
 #define PROJECTMANAGER_H
 
 #include <QJsonObject>
+#include <QDir>
 
 #include "project.h"
 
@@ -22,6 +23,8 @@ public:
     bool openProject(QString projectFile);
     void closeProject();
     bool saveProject();
+
+    QDir projectDir() const;
 
 private:
      Project* mProject;

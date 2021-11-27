@@ -1,5 +1,6 @@
 #include "projectmanager.h"
 #include <QFile>
+#include <QFileInfo>
 #include <QJsonDocument>
 #include <QJsonParseError>
 #include <QJsonObject>
@@ -172,6 +173,19 @@ bool ProjectManager::saveProject()
     {
         mErrorMessage = "There is no project open to save";
         return false;
+    }
+}
+
+QDir ProjectManager::projectDir() const
+{
+    if (mProject)
+    {
+        QFileInfo fi(mProject->file());
+        return fi.absoluteDir();
+    }
+    else
+    {
+        return QDir();
     }
 }
 

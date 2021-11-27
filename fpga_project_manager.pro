@@ -12,15 +12,18 @@ SOURCES += \
     hdlparserarchitecturedefinition.cpp \
     hdlparserentitydefinition.cpp \
     hdlparsergenericdefinition.cpp \
+    hdlparsermoduleinstantiation.cpp \
     hdlparserportdefinition.cpp \
     hdlparsersignaldefinition.cpp \
     hdlparsertypedefinition.cpp \
     main.cpp \
     mainwindow.cpp \
+    preferencesmanager.cpp \
     project.cpp \
     projectmanager.cpp \
     projectsummarywidget.cpp \
     semanticversion.cpp \
+    sourcemanager.cpp \
     unittesthdlparserdialog.cpp \
     vhdldependencyparser.cpp
 
@@ -28,14 +31,17 @@ HEADERS += \
     hdlparserarchitecturedefinition.h \
     hdlparserentitydefinition.h \
     hdlparsergenericdefinition.h \
+    hdlparsermoduleinstantiation.h \
     hdlparserportdefinition.h \
     hdlparsersignaldefinition.h \
     hdlparsertypedefinition.h \
     mainwindow.h \
+    preferencesmanager.h \
     project.h \
     projectmanager.h \
     projectsummarywidget.h \
     semanticversion.h \
+    sourcemanager.h \
     unittesthdlparserdialog.h \
     vhdldependencyparser.h
 
@@ -51,3 +57,5 @@ FORMS += \
 test_data.path = $${OUT_PWD}/test
 test_data.files += test/*
 INSTALLS += test_data
+
+RESOURCES +=
