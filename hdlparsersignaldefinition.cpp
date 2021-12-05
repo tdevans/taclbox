@@ -3,7 +3,7 @@
 #include <QRegularExpressionMatch>
 #include <QRegularExpressionMatchIterator>
 
-const QString HdlParserSignalDefinition::SIGNAL_PATTERN = "signal\\s+(?<name>[a-zA-Z][a-zA-Z0-9_,\\s]*?)\\s*:\\s*(?<type>[a-zA-Z][a-zA-Z0-9_\\s]*(?:\\([a-zA-Z0-9\\s]*\\))*)";
+const QString HdlParserSignalDefinition::SIGNAL_PATTERN = "signal\\s+(?<name>[a-z][a-z0-9_,\\s]*?)\\s*:\\s*(?<type>[a-z][a-z0-9_.\\s]*(?:\\([a-z0-9\\s]*\\))*)";
 
 HdlParserSignalDefinition::HdlParserSignalDefinition()
 {
@@ -20,7 +20,7 @@ QList<HdlParserSignalDefinition> HdlParserSignalDefinition::parseText(const QStr
 {
     QList<HdlParserSignalDefinition> sigs;
 
-    QRegularExpression signalRegex(SIGNAL_PATTERN);
+    QRegularExpression signalRegex(SIGNAL_PATTERN, QRegularExpression::CaseInsensitiveOption);
     QRegularExpressionMatchIterator signalMatches = signalRegex.globalMatch(text);
 
     while (signalMatches.hasNext())

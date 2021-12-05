@@ -4,7 +4,7 @@
 #include <QRegularExpressionMatchIterator>
 #include <QDebug>
 
-const QString HdlParserGenericDefinition::GENERIC_PATTERN = "(?<name>[a-zA-Z][a-zA-Z0-9_]*)\\s*:\\s+(?<type>[a-zA-Z][a-zA-Z0-9_\\s]*(?:\\([a-zA-Z0-9\\s]*\\))*)";
+const QString HdlParserGenericDefinition::GENERIC_PATTERN = "(?<name>[a-z][a-z0-9_]*)\\s*:\\s+(?<type>[a-z][a-z0-9_\\s]*(?:\\([a-z0-9\\s]*\\))*)";
 
 HdlParserGenericDefinition::HdlParserGenericDefinition()
 {
@@ -21,7 +21,7 @@ QList<HdlParserGenericDefinition> HdlParserGenericDefinition::parseText(const QS
 {
     QList<HdlParserGenericDefinition> generics;
 
-    QRegularExpression genericRegex(GENERIC_PATTERN);
+    QRegularExpression genericRegex(GENERIC_PATTERN, QRegularExpression::CaseInsensitiveOption);
     QRegularExpressionMatchIterator genericMatches = genericRegex.globalMatch(text);
 
     while (genericMatches.hasNext())

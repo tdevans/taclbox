@@ -10,6 +10,10 @@ class HdlParserPackageHeaderDefinition
 public:
     static QList<HdlParserPackageHeaderDefinition> parseText(const QStringRef text, QString filePath, int startingLine);
 
+    QString name() const;
+    QString filePath() const;
+    int lineNum() const;
+
 private:
     static const QString PACKAGE_HEADER_START_PATTERN;
 

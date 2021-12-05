@@ -3,10 +3,10 @@
 #include <QRegularExpressionMatch>
 #include <QRegularExpressionMatchIterator>
 
-const QString HdlParserTypeDefinition::ENUM_PATTERN = "type\\s+(?<name>[a-zA-Z][a-zA-Z0-9_]*)\\s+is\\s+\\((?<values>[a-zA-Z0-9_,\\s]+)\\)";
-const QString HdlParserTypeDefinition::SCALAR_PATTERN = "type\\s+(?<name>[a-zA-Z][a-zA-Z0-9_]*)\\s+is\\s+range\\s+(?<left>-?[0-9]+(?:.[0-9]+)?(?:[eE]-?[0-9]+)?)\\s+(?<dir>to|downto)\\s+(?<right>-?[0-9]+(?:.[0-9]+)?(?:[eE]-?[0-9]+)?)";
-const QString HdlParserTypeDefinition::ARRAY_PATTERN = "type\\s+(?<name>[a-zA-Z][a-zA-Z0-9_]*)\\s+is\\s+array\\s+\\((?<dims>[a-zA-Z0-9_\\s,<>\\-]+)\\)\\s+of\\s+(?<type>[a-zA-Z][a-zA-Z0-9_]+(?:[\\(\\)a-zA-Z0-9_\\s\\-]+)?)";
-const QString HdlParserTypeDefinition::UNCONSTRAINED_RANGE_PATTERN = "(?<name>[a-zA-Z][a-zA-Z0-9_]+)\\s+range\\s+<>";
+const QString HdlParserTypeDefinition::ENUM_PATTERN = "type\\s+(?<name>[a-z][a-z0-9_]*)\\s+is\\s+\\((?<values>[a-z0-9_,\\s]+)\\)";
+const QString HdlParserTypeDefinition::SCALAR_PATTERN = "type\\s+(?<name>[a-z][a-z0-9_]*)\\s+is\\s+range\\s+(?<left>-?[0-9]+(?:.[0-9]+)?(?:[eE]-?[0-9]+)?)\\s+(?<dir>to|downto)\\s+(?<right>-?[0-9]+(?:.[0-9]+)?(?:[eE]-?[0-9]+)?)";
+const QString HdlParserTypeDefinition::ARRAY_PATTERN = "type\\s+(?<name>[a-z][a-z0-9_]*)\\s+is\\s+array\\s+\\((?<dims>[a-z0-9_\\s,<>\\-]+)\\)\\s+of\\s+(?<type>[a-z][a-z0-9_]+(?:[\\(\\)a-z0-9_\\s\\-]+)?)";
+const QString HdlParserTypeDefinition::UNCONSTRAINED_RANGE_PATTERN = "(?<name>[a-z][a-z0-9_]+)\\s+range\\s+<>";
 const QString HdlParserTypeDefinition::CONSTRAINED_RANGE_PATTERN = "(?<left>-?[0-9]+)\\s+(?<dir>to|downto)\\s+(?<right>-?[0-9]+)";
 
 HdlParserTypeDefinition::HdlParserTypeDefinition()
@@ -24,7 +24,7 @@ QList<HdlParserTypeDefinition> HdlParserTypeDefinition::parseText(const QStringR
 {
     QList<HdlParserTypeDefinition> types;
 
-    QRegularExpression enumRegex(ENUM_PATTERN);
+    QRegularExpression enumRegex(ENUM_PATTERN, QRegularExpression::CaseInsensitiveOption);
     QRegularExpressionMatchIterator enumMatches = enumRegex.globalMatch(text);
 
     while (enumMatches.hasNext())
@@ -46,7 +46,7 @@ QList<HdlParserTypeDefinition> HdlParserTypeDefinition::parseText(const QStringR
     }
 
 
-    QRegularExpression scalarRegex(SCALAR_PATTERN);
+    QRegularExpression scalarRegex(SCALAR_PATTERN, QRegularExpression::CaseInsensitiveOption);
     QRegularExpressionMatchIterator scalarMatches = scalarRegex.globalMatch(text);
 
     while (scalarMatches.hasNext())
@@ -67,9 +67,9 @@ QList<HdlParserTypeDefinition> HdlParserTypeDefinition::parseText(const QStringR
     }
 
 
-    QRegularExpression arrayRegex(ARRAY_PATTERN);
-    QRegularExpression unconstrainedRegex(UNCONSTRAINED_RANGE_PATTERN);
-    QRegularExpression constrainedRegex(CONSTRAINED_RANGE_PATTERN);
+    QRegularExpression arrayRegex(ARRAY_PATTERN, QRegularExpression::CaseInsensitiveOption);
+    QRegularExpression unconstrainedRegex(UNCONSTRAINED_RANGE_PATTERN, QRegularExpression::CaseInsensitiveOption);
+    QRegularExpression constrainedRegex(CONSTRAINED_RANGE_PATTERN, QRegularExpression::CaseInsensitiveOption);
 
     QRegularExpressionMatchIterator arrayMatches = arrayRegex.globalMatch(text);
 

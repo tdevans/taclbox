@@ -2,7 +2,7 @@
 #include <QRegularExpression>
 #include <QDebug>
 
-const QString HdlParserEntityDefinition::ENTITY_START_PATTERN = "entity\\s+(?<name>[a-zA-Z]\\w*)\\s+is"; // Capture group grabs the entity name
+const QString HdlParserEntityDefinition::ENTITY_START_PATTERN = "entity\\s+(?<name>[a-z][a-z0-9_]*)\\s+is"; // Capture group grabs the entity name
 const QString HdlParserEntityDefinition::ENTITY_END_PATTERN = "end\\s+(?:entity\\s+)?%1;"; // Make entity name variable here, to be filled in when we start the entity
 const QString HdlParserEntityDefinition::GENERIC_SECTION_START_PATTERN = "generic\\s*\\(";
 const QString HdlParserEntityDefinition::PORT_SECTION_START_PATTERN = "port\\s*\\(";
@@ -25,10 +25,10 @@ QList<HdlParserEntityDefinition> HdlParserEntityDefinition::parseText(const QStr
     QList<HdlParserEntityDefinition> e;
 
     int entityStart = 0;
-    QRegularExpression entityStartRegex(ENTITY_START_PATTERN);
-    QRegularExpression genericSectionStartRegex(GENERIC_SECTION_START_PATTERN);
-    QRegularExpression portSectionStartRegex(PORT_SECTION_START_PATTERN);
-    QRegularExpression genericSectionEndRegex(GENERIC_OR_PORT_SECTION_END_PATTERN);
+    QRegularExpression entityStartRegex(ENTITY_START_PATTERN, QRegularExpression::CaseInsensitiveOption);
+    QRegularExpression genericSectionStartRegex(GENERIC_SECTION_START_PATTERN, QRegularExpression::CaseInsensitiveOption);
+    QRegularExpression portSectionStartRegex(PORT_SECTION_START_PATTERN, QRegularExpression::CaseInsensitiveOption);
+    QRegularExpression genericSectionEndRegex(GENERIC_OR_PORT_SECTION_END_PATTERN, QRegularExpression::CaseInsensitiveOption);
     QRegularExpressionMatch ms;
     QRegularExpressionMatch me;
     QRegularExpressionMatch gs;

@@ -1,0 +1,26 @@
+{
+	"defines" : {
+		"entity" : [
+		],
+		"architecture" : [
+		],
+		"packageHeader" : [
+			{
+				"name" : "example_package"
+			}
+		],
+		"packageBody" : [
+			{
+				"name" : "example_package"
+			}
+		]
+	},
+	"depends" : {
+		"library" : [
+		],
+		"package" : [
+		],
+		"module" : [
+		]
+	}
+}

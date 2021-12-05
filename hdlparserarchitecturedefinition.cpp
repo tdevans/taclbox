@@ -2,7 +2,7 @@
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 
-const QString HdlParserArchitectureDefinition::ARCHITECTURE_START_PATTERN = "architecture\\s+(?<name>[a-zA-Z][a-zA-Z0-9_]*)\\s+of\\s+(?<entity>[a-zA-Z][a-zA-Z0-9_]*)\\s+is";
+const QString HdlParserArchitectureDefinition::ARCHITECTURE_START_PATTERN = "architecture\\s+(?<name>[a-z][a-z0-9_]*)\\s+of\\s+(?<entity>[a-z][a-z0-9_]*)\\s+is";
 const QString HdlParserArchitectureDefinition::ARCHITECTURE_END_PATTERN = "end\\s+(?:architecture\\s+)?%1;"; // Need to fill in the architecture name before matching
 
 HdlParserArchitectureDefinition::HdlParserArchitectureDefinition()
@@ -21,7 +21,7 @@ QList<HdlParserArchitectureDefinition> HdlParserArchitectureDefinition::parseTex
     QList<HdlParserArchitectureDefinition> architectures;
 
     int architectureStart = 0;
-    QRegularExpression architectureStartRegex(ARCHITECTURE_START_PATTERN);
+    QRegularExpression architectureStartRegex(ARCHITECTURE_START_PATTERN, QRegularExpression::CaseInsensitiveOption);
     QRegularExpressionMatch ms;
     QRegularExpressionMatch me;
 
@@ -33,7 +33,7 @@ QList<HdlParserArchitectureDefinition> HdlParserArchitectureDefinition::parseTex
             architectureStart = ms.capturedEnd();
             QString architectureName = ms.captured("name");
             QString architectureEntityName = ms.captured("entity");
-            QRegularExpression architectureEndRegex(ARCHITECTURE_END_PATTERN.arg(architectureName));
+            QRegularExpression architectureEndRegex(ARCHITECTURE_END_PATTERN.arg(architectureName), QRegularExpression::CaseInsensitiveOption);
             me = architectureEndRegex.match(text, ms.capturedStart() + ms.capturedLength());
             if (me.hasMatch())
             {

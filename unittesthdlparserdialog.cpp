@@ -17,6 +17,9 @@
 #include "hdlparserentitydefinition.h"
 #include "hdlparserarchitecturedefinition.h"
 #include "hdlparsermoduleinstantiation.h"
+#include "hdlparserpackageheaderdefinition.h"
+#include "hdlparserpackagebodydefinition.h"
+#include "hdlparseruseclause.h"
 
 UnitTestHdlParserDialog::UnitTestHdlParserDialog(QWidget *parent) :
     QDialog(parent),
@@ -775,6 +778,136 @@ void UnitTestHdlParserDialog::runTestFile(TestFile& tf, ExpectFile& ef)
             if (!architectureFound)
             {
                 ui->testResultsTextEdit->appendHtml(QString("<span style=\"color: red\">Error: Did not find expected architecture %1 for entity %2.</span>").arg(ad.name, ad.entityName));
+                pass = false;
+            }
+        }
+
+        // Make sure all the package header definitions we find are expected
+        ui->testResultsTextEdit->appendPlainText(QString("\tDefines Packages:"));
+        QList<HdlParserPackageHeaderDefinition> parsedPackages = HdlParserPackageHeaderDefinition::parseText(QStringRef(&txt), tf.filePath, 1);
+        for (const auto& parsedPackage : parsedPackages)
+        {
+            ui->testResultsTextEdit->appendPlainText(QString("\t\t@line=%1: name=%2").arg(parsedPackage.lineNum()).arg(parsedPackage.name()));
+            bool foundPackage = false;
+            for (const auto& expectedPackage : ef.packageHeaderDefinitions)
+            {
+                if (parsedPackage.name() == expectedPackage.name)
+                {
+                    foundPackage = true;
+                    break;
+                }
+            }
+
+            if (!foundPackage)
+            {
+                ui->testResultsTextEdit->appendHtml(QString("<span style=\"color: red\">Error: Found package header definition name=%1, but it was not expected.</span>").arg(parsedPackage.name()));
+                pass = false;
+            }
+        }
+
+        // Make sure we found all of the package header definitions we expected to find
+        for (const auto& expectedPackage : ef.packageHeaderDefinitions)
+        {
+            bool foundPackage = false;
+            for (const auto& parsedPackage : parsedPackages)
+            {
+                if (parsedPackage.name() == expectedPackage.name)
+                {
+                    foundPackage = true;
+                    break;
+                }
+            }
+
+            if (!foundPackage)
+            {
+                ui->testResultsTextEdit->appendHtml(QString("<span style=\"color: red\">Error: Unable to locate package definition name=%1.</span>").arg(expectedPackage.name));
+                pass = false;
+            }
+        }
+
+        // Make sure all the package body definitions we find are expected
+        ui->testResultsTextEdit->appendPlainText(QString("\tDefines Package Bodies:"));
+        QList<HdlParserPackageBodyDefinition> parsedPackageBodies = HdlParserPackageBodyDefinition::parseText(QStringRef(&txt), tf.filePath, 1);
+        for (const auto& parsedPackage : parsedPackageBodies)
+        {
+            ui->testResultsTextEdit->appendPlainText(QString("\t\t@line=%1: name=%2").arg(parsedPackage.lineNum()).arg(parsedPackage.name()));
+            bool foundPackage = false;
+            for (const auto& expectedPackage : ef.packageBodyDefinitions)
+            {
+                if (parsedPackage.name() == expectedPackage.name)
+                {
+                    foundPackage = true;
+                    break;
+                }
+            }
+
+            if (!foundPackage)
+            {
+                ui->testResultsTextEdit->appendHtml(QString("<span style=\"color: red\">Error: Found package body definition name=%1, but it was not expected.</span>").arg(parsedPackage.name()));
+                pass = false;
+            }
+        }
+
+        // Make sure we found all of the package header definitions we expected to find
+        for (const auto& expectedPackage : ef.packageBodyDefinitions)
+        {
+            bool foundPackage = false;
+            for (const auto& parsedPackage : parsedPackageBodies)
+            {
+                if (parsedPackage.name() == expectedPackage.name)
+                {
+                    foundPackage = true;
+                    break;
+                }
+            }
+
+            if (!foundPackage)
+            {
+                ui->testResultsTextEdit->appendHtml(QString("<span style=\"color: red\">Error: Unable to locate package body definition name=%1.</span>").arg(expectedPackage.name));
+                pass = false;
+            }
+        }
+
+
+        // Make sure all the package use declarations we found were ones we were expecting
+        ui->testResultsTextEdit->appendPlainText(QString("\tDepends on Packages:"));
+        QList<HdlParserUseClause> parsedUses = HdlParserUseClause::parseText(QStringRef(&txt), tf.filePath, 1);
+        for (const auto& parsedUse : parsedUses)
+        {
+            ui->testResultsTextEdit->appendPlainText(QString("\t\t@line=%1: library=%2, package=%3, item=%4").arg(parsedUse.lineNum()).arg(parsedUse.libraryName(), parsedUse.packageName(), parsedUse.itemName()));
+            bool foundPackage = false;
+            for (const auto& expectedPackage : ef.packageDependencies)
+            {
+                if ((parsedUse.libraryName() == expectedPackage.libraryName) && (parsedUse.packageName() == expectedPackage.name))
+                {
+                    foundPackage = true;
+                    break;
+                }
+            }
+
+            if (!foundPackage)
+            {
+                ui->testResultsTextEdit->appendHtml(QString("<span style=\"color: red\">Error: Found package use clause library = %1, package = %2, item = %3, but it was not expected.</span>").arg(parsedUse.libraryName(), parsedUse.packageName(), parsedUse.itemName()));
+                pass = false;
+            }
+        }
+
+        // Make sure we found all of the package uses we were expecting to find
+        for (const auto& expectedPackage : ef.packageDependencies)
+        {
+            bool foundPackage = false;
+            for (const auto& parsedUse : parsedUses)
+            {
+                if ((parsedUse.libraryName() == expectedPackage.libraryName) && (parsedUse.packageName() == expectedPackage.name))
+                {
+                    foundPackage = true;
+                    break;
+                }
+            }
+
+            if (!foundPackage)
+            {
+                ui->testResultsTextEdit->appendHtml(QString("<span style=\"color: red\">Error: Unable to locate package use clause library=%1, package=%2.</span>").arg(expectedPackage.libraryName, expectedPackage.name));
                 pass = false;
             }
         }

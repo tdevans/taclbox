@@ -4,7 +4,7 @@
 #include <QRegularExpressionMatchIterator>
 #include <QDebug>
 
-const QString HdlParserPortDefinition::PORT_PATTERN = "(?<name>[a-zA-Z][a-zA-Z0-9_]*)\\s*:\\s*(?<dir>in|out|inout)\\s+(?<type>[a-zA-Z][a-zA-Z0-9_\\s]*(?:\\([a-zA-Z0-9\\s]*\\))*)";
+const QString HdlParserPortDefinition::PORT_PATTERN = "(?<name>[a-z][a-z0-9_]*)\\s*:\\s*(?<dir>in|out|inout)\\s+(?<type>[a-z][a-z0-9_\\s]*(?:\\([a-z0-9\\s]*\\))*)";
 
 HdlParserPortDefinition::HdlParserPortDefinition()
 {
@@ -21,7 +21,7 @@ QList<HdlParserPortDefinition> HdlParserPortDefinition::parseText(const QStringR
 {
     QList<HdlParserPortDefinition> ports;
 
-    QRegularExpression portRegex(PORT_PATTERN);
+    QRegularExpression portRegex(PORT_PATTERN, QRegularExpression::CaseInsensitiveOption);
     QRegularExpressionMatchIterator portMatches = portRegex.globalMatch(text);
 
     while (portMatches.hasNext())

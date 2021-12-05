@@ -13,10 +13,12 @@ SOURCES += \
     hdlparserentitydefinition.cpp \
     hdlparsergenericdefinition.cpp \
     hdlparsermoduleinstantiation.cpp \
+    hdlparserpackagebodydefinition.cpp \
     hdlparserpackageheaderdefinition.cpp \
     hdlparserportdefinition.cpp \
     hdlparsersignaldefinition.cpp \
     hdlparsertypedefinition.cpp \
+    hdlparseruseclause.cpp \
     main.cpp \
     mainwindow.cpp \
     preferencesmanager.cpp \
@@ -33,10 +35,12 @@ HEADERS += \
     hdlparserentitydefinition.h \
     hdlparsergenericdefinition.h \
     hdlparsermoduleinstantiation.h \
+    hdlparserpackagebodydefinition.h \
     hdlparserpackageheaderdefinition.h \
     hdlparserportdefinition.h \
     hdlparsersignaldefinition.h \
     hdlparsertypedefinition.h \
+    hdlparseruseclause.h \
     mainwindow.h \
     preferencesmanager.h \
     project.h \
