@@ -20,6 +20,7 @@
 #include "hdlparserpackageheaderdefinition.h"
 #include "hdlparserpackagebodydefinition.h"
 #include "hdlparseruseclause.h"
+#include "hdlparsercomments.h"
 
 UnitTestHdlParserDialog::UnitTestHdlParserDialog(QWidget *parent) :
     QDialog(parent),
@@ -488,13 +489,15 @@ void UnitTestHdlParserDialog::runTestFile(TestFile& tf, ExpectFile& ef)
     QFile f(tf.filePath);
     if (f.open(QIODevice::ReadOnly))
     {
-        QString txt = f.readAll();
+        QString txt = removeComments(f.readAll());
         f.close();
 
         ui->testResultsTextEdit->appendPlainText(QString("Parsing %1...").arg(tf.filePath));
 
         // We'll set this to fail if any of the individual tests fails
         bool pass = true;
+
+        // Remove any comments so they don't mess up other parsing
 
         // Parse the file to get the entities it defines
         QList<HdlParserEntityDefinition> e = HdlParserEntityDefinition::parseText(QStringRef(&txt), tf.filePath, 1);

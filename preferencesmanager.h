@@ -5,6 +5,7 @@
 #include <QSize>
 #include <QPoint>
 #include <QByteArray>
+#include <QStringList>
 
 class PreferencesManager
 {
@@ -19,8 +20,12 @@ public:
     void setMainWindowPos(QPoint pos);
     QByteArray mainWindowSplitterState() const;
     void setMainWindowSplitterState(QByteArray state);
+    QStringList mainWindowRecentProjects() const;
+    void setMainWindowMostRecentProject(QString project);
 
 private:
+    static const int MAX_RECENT_PROJECTS;
+
     QSettings mSettings;
 
 };

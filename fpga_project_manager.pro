@@ -10,6 +10,7 @@ CONFIG += c++11
 
 SOURCES += \
     hdlparserarchitecturedefinition.cpp \
+    hdlparsercomments.cpp \
     hdlparserentitydefinition.cpp \
     hdlparsergenericdefinition.cpp \
     hdlparsermoduleinstantiation.cpp \
@@ -32,6 +33,7 @@ SOURCES += \
 
 HEADERS += \
     hdlparserarchitecturedefinition.h \
+    hdlparsercomments.h \
     hdlparserentitydefinition.h \
     hdlparsergenericdefinition.h \
     hdlparsermoduleinstantiation.h \

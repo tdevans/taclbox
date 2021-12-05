@@ -3,6 +3,9 @@
 
 #include <QMainWindow>
 #include <QTreeWidgetItem>
+#include <QList>
+#include <QAction>
+
 #include "projectmanager.h"
 #include "projectsummarywidget.h"
 #include "sourcemanager.h"
@@ -34,11 +37,17 @@ private:
     QTreeWidgetItem* mSourceFilesTreeWidgetItem;
     QTreeWidgetItem* mTestbenchFilesTreeWidgetItem;
 
+    QList<QAction*> mRecentProjectActions;
+
+    void refreshRecentProjects();
     void updateProject();
     bool checkQuit();
 
 private slots:
-    void openProject();
+    void openProject(QString prjFile);
+    void openRecentProject();
+    void openProjectDialog();
+    void closeProject();
     void openUnitTestDependencyParser();
 };
 

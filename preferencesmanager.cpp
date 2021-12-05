@@ -1,5 +1,7 @@
 #include "preferencesmanager.h"
 
+const int PreferencesManager::MAX_RECENT_PROJECTS = 5;
+
 PreferencesManager::PreferencesManager()
     : mSettings(QSettings::IniFormat, QSettings::UserScope, "TACL", "Taclbox")
 {
@@ -44,4 +46,31 @@ QByteArray PreferencesManager::mainWindowSplitterState() const
 void PreferencesManager::setMainWindowSplitterState(QByteArray state)
 {
     mSettings.setValue("mainwindow/split", state);
+}
+
+QStringList PreferencesManager::mainWindowRecentProjects() const
+{
+    return mSettings.value("mainwindow/recentprojects").toStringList();
+}
+
+void PreferencesManager::setMainWindowMostRecentProject(QString project)
+{
+    QStringList oldRecentProjects = mainWindowRecentProjects();
+    QStringList newRecentProjects;
+
+    newRecentProjects.append(project);
+    for (auto& p : oldRecentProjects)
+    {
+        if (p != project)
+        {
+            newRecentProjects.append(p);
+        }
+
+        if (newRecentProjects.length() >= MAX_RECENT_PROJECTS)
+        {
+            break;
+        }
+    }
+
+    mSettings.setValue("mainwindow/recentprojects", newRecentProjects);
 }

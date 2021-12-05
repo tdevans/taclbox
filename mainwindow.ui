@@ -55,8 +55,66 @@
            <number>0</number>
           </property>
           <property name="documentMode">
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
+          <widget class="QWidget" name="structureTab">
+           <attribute name="title">
+            <string>Structure</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_6">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout">
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <spacer name="horizontalSpacer">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="structureRefreshButton">
+                <property name="text">
+                 <string>Refresh</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QTreeWidget" name="projectStructureTreeWidget">
+              <property name="headerHidden">
+               <bool>true</bool>
+              </property>
+              <column>
+               <property name="text">
+                <string notr="true">1</string>
+               </property>
+              </column>
+             </widget>
+            </item>
+           </layout>
+          </widget>
           <widget class="QWidget" name="filesTab">
            <attribute name="title">
             <string>Files</string>
@@ -76,37 +134,6 @@
             </property>
             <item>
              <widget class="QTreeWidget" name="projectFilesTreeWidget">
-              <property name="headerHidden">
-               <bool>true</bool>
-              </property>
-              <column>
-               <property name="text">
-                <string notr="true">1</string>
-               </property>
-              </column>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="structureTab">
-           <attribute name="title">
-            <string>Structure</string>
-           </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_6">
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <item>
-             <widget class="QTreeWidget" name="projectStructureTreeWidget">
               <property name="headerHidden">
                <bool>true</bool>
               </property>
@@ -155,6 +182,7 @@
     </property>
     <addaction name="action_New"/>
     <addaction name="action_Open"/>
+    <addaction name="actionClose_Project"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -193,6 +221,14 @@
   <action name="action_Open">
    <property name="text">
     <string>Open Project</string>
+   </property>
+  </action>
+  <action name="actionClose_Project">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Close Project</string>
    </property>
   </action>
  </widget>
