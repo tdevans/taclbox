@@ -11,7 +11,7 @@ ProjectManager::ProjectManager() :
 
 }
 
-const Project* ProjectManager::project() const
+Project *ProjectManager::project() const
 {
     return mProject;
 }
@@ -50,12 +50,10 @@ bool ProjectManager::openProject(QString projectFile)
     }
 
     QFile f(projectFile);
-    Project* prj = new Project();
+    Project* prj = new Project(projectFile);
 
     if (f.open(QIODevice::ReadOnly))
     {
-        prj->setFile(projectFile);
-
         QJsonDocument jsonDoc = QJsonDocument::fromJson(f.readAll());
         f.close();
 
@@ -120,6 +118,8 @@ bool ProjectManager::openProject(QString projectFile)
     else
     {
         mProject = prj;
+        mProject->refreshSourceFiles();
+        mProject->refreshTestbenchFiles();
     }
 
     return !error();
@@ -139,10 +139,10 @@ bool ProjectManager::saveProject()
 {
     if (mProject)
     {
-        QFile f(mProject->file());
+        QFile f(mProject->file().filePath());
         if (!f.open(QIODevice::WriteOnly))
         {
-            mErrorMessage = QString("Unable to open the specified project file: %1").arg(mProject->file());
+            mErrorMessage = QString("Unable to open the specified project file: %1").arg(mProject->file().filePath());
             return false;
         }
 
@@ -176,17 +176,41 @@ bool ProjectManager::saveProject()
     }
 }
 
-QDir ProjectManager::projectDir() const
+QString ProjectManager::projectPath() const
 {
     if (mProject)
     {
         QFileInfo fi(mProject->file());
-        return fi.absoluteDir();
+        return fi.absolutePath();
     }
     else
     {
-        return QDir();
+        return QString();
     }
+}
+
+QString ProjectManager::sourcePath() const
+{
+    QString srcPath;
+    QString prjPath = projectPath();
+    if (!prjPath.isNull())
+    {
+        srcPath = prjPath + "/source";
+    }
+
+    return srcPath;
+}
+
+QString ProjectManager::testbenchPath() const
+{
+    QString tbPath;
+    QString prjPath = projectPath();
+    if (!prjPath.isNull())
+    {
+        tbPath = prjPath + "/simulation/testbench";
+    }
+
+    return tbPath;
 }
 
 SemanticVersion ProjectManager::parseTaclVersion(QJsonObject rootObj)
@@ -373,3 +397,4 @@ SemanticVersion ProjectManager::parseProjectVersion(QJsonObject rootObj)
 
     return version;
 }
+

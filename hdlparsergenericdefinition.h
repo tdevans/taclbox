@@ -4,13 +4,15 @@
 #include <QString>
 #include <QList>
 
+// Forward declare so we can make the pointer w/o including the
+// file, which would cause a circular reference because HdlFile
+// contains HdlParserArchitectureDefinitions.
+class HdlFile;
+
 class HdlParserGenericDefinition
 {
 public:
-    HdlParserGenericDefinition();
-    HdlParserGenericDefinition(QString name, QString type);
-
-    static QList<HdlParserGenericDefinition> parseText(const QStringRef text, QString filePath, int startingLine);
+    static QList<HdlParserGenericDefinition> parseText(const QStringRef text, HdlFile& file, int startingLine);
 
     bool operator==(const HdlParserGenericDefinition& other);
 
@@ -20,7 +22,7 @@ public:
     QString type() const;
     void setType(QString type);
 
-    QString filePath() const;
+    HdlFile& file() const;
 
     int lineNum() const;
 
@@ -29,8 +31,10 @@ private:
 
     QString mName;
     QString mType;
-    QString mFilePath;
+    HdlFile& mFile;
     int mLineNum;
+
+    HdlParserGenericDefinition(QString name, QString type, HdlFile& file, int lineNum);
 };
 
 #endif // HDLPARSERGENERICDEFINITION_H

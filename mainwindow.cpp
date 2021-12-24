@@ -10,9 +10,10 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 #include <QDir>
+#include <QIcon>
 
-MainWindow::MainWindow(PreferencesManager *preferencesManager, ProjectManager* projectManager, SourceManager *sourceManager, QWidget *parent) :
-    QMainWindow(parent), ui(new Ui::MainWindow), mProjectManager(projectManager), mSourceManager(sourceManager), mPreferencesManager(preferencesManager), mProjectSummaryTab(nullptr)
+MainWindow::MainWindow(PreferencesManager &preferencesManager, ProjectManager &projectManager, QWidget *parent) :
+    QMainWindow(parent), ui(new Ui::MainWindow), mProjectManager(projectManager), mPreferencesManager(preferencesManager), mProjectSummaryTab(nullptr)
 {
     // Initial UI setup
     ui->setupUi(this);
@@ -44,8 +45,8 @@ MainWindow::MainWindow(PreferencesManager *preferencesManager, ProjectManager* p
 
 
     // Set up the window position and size based on our save user preferences
-    QPoint p = mPreferencesManager->mainWindowPos();
-    QSize s = mPreferencesManager->mainWindowSize();
+    QPoint p = mPreferencesManager.mainWindowPos();
+    QSize s = mPreferencesManager.mainWindowSize();
 
     if ((p.x() >= qApp->primaryScreen()->availableGeometry().width()) ||  (p.y() >= qApp->primaryScreen()->availableGeometry().height()))
     {
@@ -58,12 +59,12 @@ MainWindow::MainWindow(PreferencesManager *preferencesManager, ProjectManager* p
 
     resize(s);
 
-    if (mPreferencesManager->mainWindowMaximized())
+    if (mPreferencesManager.mainWindowMaximized())
     {
         showMaximized();
     }
 
-    ui->splitter->restoreState(mPreferencesManager->mainWindowSplitterState());
+    ui->splitter->restoreState(mPreferencesManager.mainWindowSplitterState());
 
 
     // Add any recently used projects to the recent projects list
@@ -75,7 +76,7 @@ MainWindow::MainWindow(PreferencesManager *preferencesManager, ProjectManager* p
     connect(ui->actionClose_Project, &QAction::triggered, this, &MainWindow::closeProject);
     connect(ui->actionExit, &QAction::triggered, qApp, &QCoreApplication::exit);
     connect(ui->actionDependency_Parser, &QAction::triggered, this, &MainWindow::openUnitTestDependencyParser);
-
+    connect(ui->structureRefreshButton, &QPushButton::clicked, this, &MainWindow::refreshProjectStructure);
 }
 
 MainWindow::~MainWindow()
@@ -89,16 +90,16 @@ void MainWindow::closeEvent(QCloseEvent *event)
     {
         if (isMaximized())
         {
-            mPreferencesManager->setMainWindowMaximized(true);
+            mPreferencesManager.setMainWindowMaximized(true);
         }
         else
         {
-            mPreferencesManager->setMainWindowMaximized(false);
-            mPreferencesManager->setMainWindowSize(size());
-            mPreferencesManager->setMainWindowPos(pos());
+            mPreferencesManager.setMainWindowMaximized(false);
+            mPreferencesManager.setMainWindowSize(size());
+            mPreferencesManager.setMainWindowPos(pos());
         }
 
-        mPreferencesManager->setMainWindowSplitterState(ui->splitter->saveState());
+        mPreferencesManager.setMainWindowSplitterState(ui->splitter->saveState());
 
         event->accept();
     }
@@ -119,33 +120,26 @@ void MainWindow::refreshRecentProjects()
 
     mRecentProjectActions.clear();
 
-    if (mPreferencesManager)
-    {
-        QStringList recentProjects = mPreferencesManager->mainWindowRecentProjects();
+    QStringList recentProjects = mPreferencesManager.mainWindowRecentProjects();
 
-        for (auto& p : recentProjects)
+    for (auto& p : recentProjects)
+    {
+        QAction* a = new QAction(p);
+        if (a)
         {
-            QAction* a = new QAction(p);
-            if (a)
-            {
-                ui->menuFile->insertAction(ui->actionExit, a);
-                mRecentProjectActions.append(a);
-                connect(a, &QAction::triggered, this, &MainWindow::openRecentProject);
-            }
+            ui->menuFile->insertAction(ui->actionExit, a);
+            mRecentProjectActions.append(a);
+            connect(a, &QAction::triggered, this, &MainWindow::openRecentProject);
         }
+    }
 
-        QAction* s = ui->menuFile->insertSeparator(ui->actionExit);
-        mRecentProjectActions.append(s);
-    }
-    else
-    {
-        qDebug() << "Somehow, there was no pointer to a preferences manager set in MainWindow";
-    }
+    QAction* s = ui->menuFile->insertSeparator(ui->actionExit);
+    mRecentProjectActions.append(s);
 }
 
 void MainWindow::updateProject()
 {
-    if (mProjectManager->project())
+    if (mProjectManager.project())
     {
         ui->actionClose_Project->setEnabled(true);
         ui->structureRefreshButton->setEnabled(true);
@@ -166,30 +160,23 @@ void MainWindow::updateProject()
 
         if (mProjectSummaryTab)
         {
-            mProjectSummaryTab->setProjectName(mProjectManager->project()->name());
-            mProjectSummaryTab->setProjectVersion(mProjectManager->project()->version());
+            mProjectSummaryTab->setProjectName(mProjectManager.project()->name());
+            mProjectSummaryTab->setProjectVersion(mProjectManager.project()->version());
         }
 
-        if (mSourceManager)
+        auto sfi = mProjectManager.project()->sourceFiles();
+        for (auto& fi : sfi)
         {
-            QFileInfoList sfi = mSourceManager->sourceFiles();
-            for (auto& fi : sfi)
+            QTreeWidgetItem* i = new QTreeWidgetItem();
+            if (i)
             {
-                QTreeWidgetItem* i = new QTreeWidgetItem();
-                if (i)
-                {
-                    i->setText(0, fi.fileName());
-                    mSourceFilesTreeWidgetItem->addChild(i);
-                }
-                else
-                {
-                    qDebug() << QString("Failed to allocate new QTreeWidgetItem to display source file %1").arg(fi.fileName());
-                }
+                i->setText(0, fi.fileName());
+                mSourceFilesTreeWidgetItem->addChild(i);
             }
-        }
-        else
-        {
-            qDebug() << "The SourceManager pointer is null in MainWindow";
+            else
+            {
+                qDebug() << QString("Failed to allocate new QTreeWidgetItem to display source file %1").arg(fi.fileName());
+            }
         }
     }
     else
@@ -208,7 +195,7 @@ void MainWindow::updateProject()
 
 bool MainWindow::checkQuit()
 {
-    if (mProjectManager->projectIsDirty())
+    if (mProjectManager.projectIsDirty())
     {
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question(this, "Quit", "Are you sure you want to quit?", QMessageBox::Yes | QMessageBox::No);
@@ -220,32 +207,72 @@ bool MainWindow::checkQuit()
     }
 }
 
+void MainWindow::addLibraryToStructure(QList<HdlParserLibrary>& lib)
+{
+    if (!lib.isEmpty())
+    {
+        QTreeWidgetItem* libItem = new QTreeWidgetItem;
+        if (!libItem)
+        {
+            qDebug() << "Failed to allocate QTreeWidgetItem for library display in project structure";
+        }
+        else
+        {
+            libItem->setText(0, lib[0].name());
+
+            // Only do further processing on the library if we successfully parsed only
+            // one library with this naem. Otherwise, we want to show the user an error
+            // indicator that there is a conflict of library names.
+            if (lib.count() == 1)
+            {
+                for (auto& x : lib[0].packages())
+                {
+                    addPackageToStructure(libItem, x);
+                }
+            }
+
+            ui->projectStructureTreeWidget->addTopLevelItem(libItem);
+        }
+    }
+}
+
+void MainWindow::addPackageToStructure(QTreeWidgetItem *lib, QList<HdlParserPackageHeaderDefinition> &pkg)
+{
+    if (!pkg.isEmpty())
+    {
+        QTreeWidgetItem* pkgItem = new QTreeWidgetItem;
+        if (pkgItem)
+        {
+            pkgItem->setText(0, pkg[0].name());
+            pkgItem->setIcon(0, QIcon(":/icons/icons/package.png"));
+            lib->addChild(pkgItem);
+        }
+        else
+        {
+            qDebug() << "Unable to allocate QTreeWidgetItem for package in structure";
+        }
+    }
+}
+
 void MainWindow::openProject(QString prjFile)
 {
     if (!prjFile.isEmpty())
     {
-        if (mProjectManager)
-        {
-            prjFile = QDir::cleanPath(prjFile);
+        prjFile = QDir::cleanPath(prjFile);
 
-            if (mProjectManager->openProject(prjFile))
-            {
-                mPreferencesManager->setMainWindowMostRecentProject(prjFile);
-                refreshRecentProjects();
-                updateProject();
-            }
-            else
-            {
-                qDebug() << "Unable to open the specified project";
-                if (mProjectManager->error())
-                {
-                    qDebug() << mProjectManager->errorMessage();
-                }
-            }
+        if (mProjectManager.openProject(prjFile))
+        {
+            mPreferencesManager.setMainWindowMostRecentProject(prjFile);
+            refreshRecentProjects();
+            updateProject();
         }
         else
         {
-            qDebug() << "The ProjectManager pointer passed to MainWindow was null.";
+            qDebug() << "Unable to open the specified project";
+            if (mProjectManager.error())
+            {
+                qDebug() << mProjectManager.errorMessage();
+            }
         }
     }
 }
@@ -267,17 +294,10 @@ void MainWindow::openProjectDialog()
 
 void MainWindow::closeProject()
 {
-    if (mProjectManager)
+    if (mProjectManager.projectIsOpen())
     {
-        if (mProjectManager->projectIsOpen())
-        {
-            mProjectManager->closeProject();
-            updateProject();
-        }
-    }
-    else
-    {
-        qDebug() << "The ProjectManager pointer passed to MainWindow was null.";
+        mProjectManager.closeProject();
+        updateProject();
     }
 }
 
@@ -286,4 +306,9 @@ void MainWindow::openUnitTestDependencyParser()
     UnitTestHdlParserDialog* u = new UnitTestHdlParserDialog(this);
     u->setAttribute(Qt::WA_DeleteOnClose);
     u->show();
+}
+
+void MainWindow::refreshProjectStructure()
+{
+    ui->projectStructureTreeWidget->clear();
 }

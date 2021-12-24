@@ -6,31 +6,23 @@
 #include "hdlparsertypedefinition.h"
 #include "hdlparsersignaldefinition.h"
 
+// Forward declare so we can make the pointer w/o including the
+// file, which would cause a circular reference because HdlFile
+// contains HdlParserArchitectureDefinitions.
+class HdlFile;
+
 class HdlParserArchitectureDefinition
 {
 public:
-    HdlParserArchitectureDefinition();
-    HdlParserArchitectureDefinition(QString name, QString entityName);
-
-    static QList<HdlParserArchitectureDefinition> parseText(const QStringRef text, QString filePath, int startingLine);
+    static QList<HdlParserArchitectureDefinition> parseText(const QStringRef text, HdlFile& file, int startingLine);
 
     QString name() const;
-    void setName(QString name);
-
     QString entityName() const;
-    void setEntityName(QString entityName);
-
-    QString filePath() const;
-
+    HdlFile& file() const;
     int lineNum() const;
 
     QList<HdlParserTypeDefinition> types() const;
-    void addType(HdlParserTypeDefinition t);
-    void removeType(HdlParserTypeDefinition t);
-
     QList<HdlParserSignalDefinition> sigs() const;
-    void addSig(HdlParserSignalDefinition sig);
-    void removeSig(HdlParserSignalDefinition sig);
 
 
 private:
@@ -39,10 +31,13 @@ private:
 
     QString mName;
     QString mEntityName;
+    HdlFile& mFile;
     int mLineNum;
-    QString mFilePath;
+
     QList<HdlParserTypeDefinition> mTypes;
     QList<HdlParserSignalDefinition> mSigs;
+
+    HdlParserArchitectureDefinition(QString name, QString entityName, HdlFile& file, int lineNum);
 
 };
 

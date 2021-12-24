@@ -9,12 +9,13 @@ const QString HdlParserModuleInstantiation::PORT_NAMED_ASSOC_PATTERN = "(?<port>
 const QString HdlParserModuleInstantiation::PORT_POSITIONAL_ASSOC_PATTERN = "(?<signal>[a-z][a-z0-9_]*)";
 const QString HdlParserModuleInstantiation::COMPONENT_INSTANTIATION_PATTERN = "(?<inst>[a-z][a-z0-9_]*)\\s*:\\s*(?<entity>[a-z][a-z0-9_]*)\\s+(?:port|generic)\\s+map\\s*\\(";
 
-HdlParserModuleInstantiation::HdlParserModuleInstantiation()
+HdlParserModuleInstantiation::HdlParserModuleInstantiation(QString inst, QString entity, QString arch, QString lib, HdlFile& file, int lineNum)
+    :mInstanceName(inst), mEntityName(entity), mArchitectureName(arch), mLibraryName(lib), mFile(file), mLineNum(lineNum)
 {
 
 }
 
-QList<HdlParserModuleInstantiation> HdlParserModuleInstantiation::parseText(const QStringRef text, QString filePath, int startingLine)
+QList<HdlParserModuleInstantiation> HdlParserModuleInstantiation::parseText(const QStringRef text, HdlFile& file, int startingLine)
 {
     QList<HdlParserModuleInstantiation> modules;
 
@@ -24,15 +25,7 @@ QList<HdlParserModuleInstantiation> HdlParserModuleInstantiation::parseText(cons
     while (entityMatches.hasNext())
     {
         QRegularExpressionMatch m = entityMatches.next();
-
-        HdlParserModuleInstantiation i;
-        i.mInstanceName = m.captured("inst");
-        i.mEntityName = m.captured("entity");
-        i.mLibraryName = m.captured("lib");
-        i.mArchitectureName = m.captured("arch"); //Note: captured() will return a null string if there was no architecture substring, which is what we'd use to represent no architeecture anyways
-        i.mFilePath = filePath;
-        i.mLineNum = startingLine + text.left(m.capturedStart()).count('\n');
-
+        HdlParserModuleInstantiation i(m.captured("inst"), m.captured("entity"), m.captured("arch"), m.captured("lib"), file, startingLine + text.left(m.capturedStart()).count('\n'));
         modules.append(i);
     }
 
@@ -42,24 +35,11 @@ QList<HdlParserModuleInstantiation> HdlParserModuleInstantiation::parseText(cons
     while (componentMatches.hasNext())
     {
         QRegularExpressionMatch m = componentMatches.next();
-
-        HdlParserModuleInstantiation i;
-        i.mInstanceName = m.captured("inst");
-        i.mEntityName = m.captured("entity");
-        i.mLibraryName = QString();
-        i.mArchitectureName = QString();
-        i.mFilePath = filePath;
-        i.mLineNum = startingLine + text.left(m.capturedStart()).count('\n');
-
+        HdlParserModuleInstantiation i(m.captured("inst"), m.captured("entity"), QString(), QString(), file, startingLine + text.left(m.capturedStart()).count('\n'));
         modules.append(i);
     }
 
     return modules;
-}
-
-bool HdlParserModuleInstantiation::operator==(const HdlParserModuleInstantiation &other) const
-{
-    return ((mInstanceName == other.mInstanceName) && (mEntityName == other.mEntityName) && (mArchitectureName == other.mArchitectureName) && (mLibraryName == other.mLibraryName) && (mFilePath == other.mFilePath) && (mLineNum == other.mLineNum));
 }
 
 QString HdlParserModuleInstantiation::instanceName() const
@@ -82,9 +62,9 @@ QString HdlParserModuleInstantiation::libraryName() const
     return mLibraryName;
 }
 
-QString HdlParserModuleInstantiation::filePath() const
+HdlFile& HdlParserModuleInstantiation::file() const
 {
-    return mFilePath;
+    return mFile;
 }
 
 int HdlParserModuleInstantiation::lineNum() const

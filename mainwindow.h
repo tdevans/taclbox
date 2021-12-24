@@ -5,11 +5,12 @@
 #include <QTreeWidgetItem>
 #include <QList>
 #include <QAction>
+#include <QMap>
 
 #include "projectmanager.h"
 #include "projectsummarywidget.h"
-#include "sourcemanager.h"
 #include "preferencesmanager.h"
+#include "hdlparserlibrary.h"
 
 namespace Ui {
 class MainWindow;
@@ -20,7 +21,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(PreferencesManager* preferencesManager, ProjectManager* projectManager, SourceManager* sourceManager, QWidget *parent = nullptr);
+    explicit MainWindow(PreferencesManager& preferencesManager, ProjectManager& projectManager, QWidget *parent = nullptr);
     ~MainWindow();
 
 protected:
@@ -28,9 +29,8 @@ protected:
 
 private:
     Ui::MainWindow *ui;
-    ProjectManager* mProjectManager;
-    SourceManager* mSourceManager;
-    PreferencesManager* mPreferencesManager;
+    ProjectManager& mProjectManager;
+    PreferencesManager& mPreferencesManager;
 
     ProjectSummaryWidget* mProjectSummaryTab;
 
@@ -43,12 +43,19 @@ private:
     void updateProject();
     bool checkQuit();
 
+    // We take a QList of library objects which share the same name
+    // This is so that if the parser found multiple declarations of
+    // the same library, we can display error information appropriately.
+    void addLibraryToStructure(QList<HdlParserLibrary>& lib);
+    void addPackageToStructure(QTreeWidgetItem* lib, QList<HdlParserPackageHeaderDefinition>& pkg);
+
 private slots:
     void openProject(QString prjFile);
     void openRecentProject();
     void openProjectDialog();
     void closeProject();
     void openUnitTestDependencyParser();
+    void refreshProjectStructure();
 };
 
 #endif // MAINWINDOW_H

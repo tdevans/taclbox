@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "preferencesmanager.h"
 #include "projectmanager.h"
-#include "sourcemanager.h"
 
 #include <QApplication>
 
@@ -11,9 +10,8 @@ int main(int argc, char *argv[])
 
     PreferencesManager prefMgr;
     ProjectManager prjMgr;
-    SourceManager srcMgr(&prjMgr);
 
-    MainWindow w(&prefMgr, &prjMgr, &srcMgr);
+    MainWindow w(prefMgr, prjMgr);
     w.show();
 
     return a.exec();

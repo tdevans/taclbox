@@ -5,7 +5,7 @@
 
 const QString HdlParserPackageBodyDefinition::PACKAGE_BODY_START_PATTERN = "package\\s+body\\s+(?<name>[a-z][a-z0-9_]*)\\s+is";
 
-QList<HdlParserPackageBodyDefinition> HdlParserPackageBodyDefinition::parseText(const QStringRef text, QString filePath, int startingLine)
+QList<HdlParserPackageBodyDefinition> HdlParserPackageBodyDefinition::parseText(const QStringRef text, HdlFile& file, int startingLine)
 {
     QList<HdlParserPackageBodyDefinition> pkgs;
 
@@ -15,10 +15,7 @@ QList<HdlParserPackageBodyDefinition> HdlParserPackageBodyDefinition::parseText(
     while (packageMatches.hasNext())
     {
         QRegularExpressionMatch packageMatch = packageMatches.next();
-        HdlParserPackageBodyDefinition pkg;
-        pkg.mName = packageMatch.captured("name");
-        pkg.mFilePath = filePath;
-        pkg.mLineNum = startingLine + text.left(packageMatch.capturedStart()).count('\n');
+        HdlParserPackageBodyDefinition pkg(packageMatch.captured("name"), file, startingLine + text.left(packageMatch.capturedStart()).count('\n'));
         pkgs.append(pkg);
     }
 
@@ -30,9 +27,9 @@ QString HdlParserPackageBodyDefinition::name() const
     return mName;
 }
 
-QString HdlParserPackageBodyDefinition::filePath() const
+HdlFile& HdlParserPackageBodyDefinition::file() const
 {
-    return mFilePath;
+    return mFile;
 }
 
 int HdlParserPackageBodyDefinition::lineNum() const
@@ -40,7 +37,8 @@ int HdlParserPackageBodyDefinition::lineNum() const
     return mLineNum;
 }
 
-HdlParserPackageBodyDefinition::HdlParserPackageBodyDefinition()
+HdlParserPackageBodyDefinition::HdlParserPackageBodyDefinition(QString name, HdlFile& file, int lineNum)
+    :mName(name), mFile(file), mLineNum(lineNum)
 {
 
 }

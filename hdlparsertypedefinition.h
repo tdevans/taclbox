@@ -6,6 +6,11 @@
 #include <QStringRef>
 #include <QList>
 
+// Forward declare so we can make the pointer w/o including the
+// file, which would cause a circular reference because HdlFile
+// contains HdlParserArchitectureDefinitions.
+class HdlFile;
+
 class HdlParserTypeDefinition
 {
 public:
@@ -20,34 +25,19 @@ public:
         bool rangeDescending;
     };
 
-    HdlParserTypeDefinition();
-    HdlParserTypeDefinition(QString name);
-
-    static QList<HdlParserTypeDefinition> parseText(const QStringRef text, QString filePath, int startingLine);
-
-    bool operator==(const HdlParserTypeDefinition& other);
-
-    TypeCategory category() const;
-    void setCateogry(TypeCategory c);
+    static QList<HdlParserTypeDefinition> parseText(const QStringRef text, HdlFile& file, int startingLine);
 
     QString name() const;
-    void setName(QString name);
+    HdlFile& file() const;
+    int lineNum() const;
 
+    TypeCategory category() const;
     QStringList enumValues() const;
-    void setEnumValues(QStringList ev);
-    void addEnumValue(QString v);
-    void removeEnumValue(QString v);
-
     double rangeLeft() const;
     double rangeRight() const;
     bool rangeDescending() const;
-
     QList<ArrayRange> arrayDimensions() const;
     QString arrayType() const;
-
-    QString filePath() const;
-
-    int lineNum() const;
 
 private:
     static const QString ENUM_PATTERN;
@@ -57,19 +47,18 @@ private:
     static const QString CONSTRAINED_RANGE_PATTERN;
 
     QString mName;
-    QString mFilePath;
-    int mLineNum;
     TypeCategory mCateogry;
+    HdlFile& mFile;
+    int mLineNum;
 
     QStringList mEnumValues;
-
     double mRangeLeft;
     double mRangeRight;
     bool mRangeDescending;
-
     QList<ArrayRange> mArrayDimensions;
     QString mArrayType;
 
+    HdlParserTypeDefinition(QString name, TypeCategory category, HdlFile& file, int lineNum);
 };
 
 #endif // HDLPARSERTYPEDEFINITION_H

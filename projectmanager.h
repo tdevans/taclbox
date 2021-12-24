@@ -3,7 +3,7 @@
 
 #include <QJsonObject>
 #include <QDir>
-
+#include <QFileSystemWatcher>
 #include "project.h"
 
 class ProjectManager
@@ -11,7 +11,7 @@ class ProjectManager
 public:
     explicit ProjectManager();
 
-    const Project* project() const;
+    Project* project() const;
 
     bool projectIsOpen() const;
     bool projectIsDirty() const;
@@ -24,7 +24,9 @@ public:
     void closeProject();
     bool saveProject();
 
-    QDir projectDir() const;
+    QString projectPath() const;
+    QString sourcePath() const;
+    QString testbenchPath() const;
 
 private:
      Project* mProject;

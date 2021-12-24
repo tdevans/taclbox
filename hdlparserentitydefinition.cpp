@@ -8,19 +8,13 @@ const QString HdlParserEntityDefinition::GENERIC_SECTION_START_PATTERN = "generi
 const QString HdlParserEntityDefinition::PORT_SECTION_START_PATTERN = "port\\s*\\(";
 const QString HdlParserEntityDefinition::GENERIC_OR_PORT_SECTION_END_PATTERN = "\\);";
 
-
-HdlParserEntityDefinition::HdlParserEntityDefinition()
+HdlParserEntityDefinition::HdlParserEntityDefinition(QString name, HdlFile& file, int lineNum)
+    :mName(name), mFile(file), mLineNum(lineNum)
 {
 
 }
 
-HdlParserEntityDefinition::HdlParserEntityDefinition(QString name)
-    :mName(name)
-{
-
-}
-
-QList<HdlParserEntityDefinition> HdlParserEntityDefinition::parseText(const QStringRef text, QString filePath, int startingLine)
+QList<HdlParserEntityDefinition> HdlParserEntityDefinition::parseText(const QStringRef text, HdlFile& file, int startingLine)
 {
     QList<HdlParserEntityDefinition> e;
 
@@ -47,10 +41,7 @@ QList<HdlParserEntityDefinition> HdlParserEntityDefinition::parseText(const QStr
             {
                 entityStart = me.capturedEnd();
 
-                HdlParserEntityDefinition x(entityName);
-
-                x.mFilePath = filePath;
-                x.mLineNum = startingLine + text.left(ms.capturedStart()).count('\n');
+                HdlParserEntityDefinition x(entityName, file, startingLine + text.left(ms.capturedStart()).count('\n'));
 
                 const QStringRef entityDeclaration = text.mid(ms.capturedStart(), me.capturedEnd() - ms.capturedStart());
                 int entityDeclarationLine = startingLine + text.left(ms.capturedStart()).count('\n');
@@ -63,13 +54,13 @@ QList<HdlParserEntityDefinition> HdlParserEntityDefinition::parseText(const QStr
                     {
                         const QStringRef genericSection = entityDeclaration.mid(gs.capturedEnd(), ps.capturedStart() - gs.capturedEnd());
                         int genericSectionLine = entityDeclarationLine + entityDeclaration.left(gs.capturedEnd()).count('\n');
-                        x.mGenerics = HdlParserGenericDefinition::parseText(genericSection, filePath, genericSectionLine);
+                        x.mGenerics = HdlParserGenericDefinition::parseText(genericSection, file, genericSectionLine);
                     }
                     else
                     {
                         const QStringRef genericSection = entityDeclaration.mid(gs.capturedEnd(), me.capturedStart() - gs.capturedEnd());
                         int genericSectionLine = entityDeclarationLine + entityDeclaration.left(gs.capturedEnd()).count('\n');
-                        x.mGenerics = HdlParserGenericDefinition::parseText(genericSection, filePath, genericSectionLine);
+                        x.mGenerics = HdlParserGenericDefinition::parseText(genericSection, file, genericSectionLine);
                     }
                 }
 
@@ -77,7 +68,7 @@ QList<HdlParserEntityDefinition> HdlParserEntityDefinition::parseText(const QStr
                 {
                     const QStringRef portSection = entityDeclaration.mid(ps.capturedEnd(), me.capturedStart() - ps.capturedEnd());
                     int portSectionLine = entityDeclarationLine + entityDeclaration.left(ps.capturedEnd()).count('\n');
-                    x.mPorts = HdlParserPortDefinition::parseText(portSection, filePath, portSectionLine);
+                    x.mPorts = HdlParserPortDefinition::parseText(portSection, file, portSectionLine);
                 }
 
                 e.append(x);
@@ -95,14 +86,9 @@ QString HdlParserEntityDefinition::name() const
     return mName;
 }
 
-void HdlParserEntityDefinition::setName(QString n)
+HdlFile& HdlParserEntityDefinition::file() const
 {
-    mName = n;
-}
-
-QString HdlParserEntityDefinition::filePath() const
-{
-    return mFilePath;
+    return mFile;
 }
 
 int HdlParserEntityDefinition::lineNum() const
@@ -110,96 +96,18 @@ int HdlParserEntityDefinition::lineNum() const
     return mLineNum;
 }
 
-QList<HdlParserGenericDefinition> HdlParserEntityDefinition::generics() const
+const QList<HdlParserGenericDefinition> HdlParserEntityDefinition::generics() const
 {
     return mGenerics;
 }
 
-void HdlParserEntityDefinition::setGenerics(QList<HdlParserGenericDefinition> genericList)
-{
-    mGenerics = genericList;
-}
 
-void HdlParserEntityDefinition::addGeneric(HdlParserGenericDefinition generic)
-{
-    if (!mGenerics.contains(generic))
-    {
-        mGenerics.append(generic);
-    }
-}
-
-void HdlParserEntityDefinition::addGeneric(QString name, QString type)
-{
-    HdlParserGenericDefinition g(name, type);
-    addGeneric(g);
-}
-
-void HdlParserEntityDefinition::removeGeneric(HdlParserGenericDefinition generic)
-{
-    mGenerics.removeAll(generic);
-}
-
-void HdlParserEntityDefinition::removeGeneric(QString name)
-{
-    QList<int> idx;
-
-    for (int i = 0; i < mGenerics.size(); ++i)
-    {
-        if (mGenerics[i].name() == name)
-        {
-            idx.append(i);
-        }
-    }
-
-    for (int i = 0; i < idx.size(); ++i)
-    {
-        mGenerics.removeAt(idx[i]);
-    }
-}
-
-QList<HdlParserPortDefinition> HdlParserEntityDefinition::ports() const
+const QList<HdlParserPortDefinition> HdlParserEntityDefinition::ports() const
 {
     return mPorts;
 }
 
-void HdlParserEntityDefinition::setPorts(QList<HdlParserPortDefinition> portList)
+const QList<HdlParserArchitectureDefinition> HdlParserEntityDefinition::architectures() const
 {
-    mPorts = portList;
-}
-
-void HdlParserEntityDefinition::addPort(HdlParserPortDefinition port)
-{
-    if (!mPorts.contains(port))
-    {
-        mPorts.append(port);
-    }
-}
-
-void HdlParserEntityDefinition::addPort(QString name, ePortDir dir, QString type)
-{
-    HdlParserPortDefinition p(name, dir, type);
-    addPort(p);
-}
-
-void HdlParserEntityDefinition::removePort(HdlParserPortDefinition port)
-{
-    mPorts.removeAll(port);
-}
-
-void HdlParserEntityDefinition::removePort(QString name)
-{
-    QList<int> idx;
-
-    for (int i = 0; i < mPorts.size(); ++i)
-    {
-        if (mPorts[i].name() == name)
-        {
-            idx.append(i);
-        }
-    }
-
-    for (int i = 0; i < idx.size(); ++i)
-    {
-        mPorts.removeAt(idx[i]);
-    }
+    return mArchitectures;
 }

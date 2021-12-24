@@ -5,18 +5,13 @@
 
 const QString HdlParserSignalDefinition::SIGNAL_PATTERN = "signal\\s+(?<name>[a-z][a-z0-9_,\\s]*?)\\s*:\\s*(?<type>[a-z][a-z0-9_.\\s]*(?:\\([a-z0-9\\s]*\\))*)";
 
-HdlParserSignalDefinition::HdlParserSignalDefinition()
+HdlParserSignalDefinition::HdlParserSignalDefinition(QString name, QString type, HdlFile& file, int lineNum)
+    : mName(name), mType(type), mFile(file), mLineNum(lineNum)
 {
 
 }
 
-HdlParserSignalDefinition::HdlParserSignalDefinition(QString name, QString typeName)
-    : mName(name), mTypeName(typeName)
-{
-
-}
-
-QList<HdlParserSignalDefinition> HdlParserSignalDefinition::parseText(const QStringRef text, QString filePath, int startingLine)
+QList<HdlParserSignalDefinition> HdlParserSignalDefinition::parseText(const QStringRef text, HdlFile& file, int startingLine)
 {
     QList<HdlParserSignalDefinition> sigs;
 
@@ -34,11 +29,7 @@ QList<HdlParserSignalDefinition> HdlParserSignalDefinition::parseText(const QStr
             QString nt = n.trimmed();
             if (!nt.isEmpty())
             {
-                HdlParserSignalDefinition s;
-                s.mName = n.trimmed();
-                s.mTypeName = m.captured("type");
-                s.mFilePath = filePath;
-                s.mLineNum = startingLine + text.left(m.capturedStart()).count('\n');
+                HdlParserSignalDefinition s(nt, m.captured("type"), file, startingLine + text.left(m.capturedStart()).count('\n'));
                 sigs.append(s);
             }
         }
@@ -47,34 +38,19 @@ QList<HdlParserSignalDefinition> HdlParserSignalDefinition::parseText(const QStr
     return sigs;
 }
 
-bool HdlParserSignalDefinition::operator==(const HdlParserSignalDefinition &other)
-{
-    return ((other.mName == mName) && (other.mTypeName == mTypeName));
-}
-
 QString HdlParserSignalDefinition::name() const
 {
     return mName;
 }
 
-void HdlParserSignalDefinition::setName(QString name)
+QString HdlParserSignalDefinition::type() const
 {
-    mName = name;
+    return mType;
 }
 
-QString HdlParserSignalDefinition::typeName() const
+HdlFile& HdlParserSignalDefinition::file() const
 {
-    return mTypeName;
-}
-
-void HdlParserSignalDefinition::setTypeName(QString typeName)
-{
-    mTypeName = typeName;
-}
-
-QString HdlParserSignalDefinition::filePath() const
-{
-    return mFilePath;
+    return mFile;
 }
 
 int HdlParserSignalDefinition::lineNum() const

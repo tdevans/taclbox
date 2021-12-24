@@ -5,7 +5,7 @@
 
 const QString HdlParserUseClause::USE_CLAUSE_PATTERN = "use\\s+(?<library>[a-z][a-z0-9_]*)\\.(?<package>[a-z][a-z0-9_]*)(?:\\.(?<item>[a-z][a-z0-9_]*))?";
 
-QList<HdlParserUseClause> HdlParserUseClause::parseText(const QStringRef text, QString filePath, int startingLine)
+QList<HdlParserUseClause> HdlParserUseClause::parseText(const QStringRef text, HdlFile &file, int startingLine)
 {
     QList<HdlParserUseClause> uses;
 
@@ -14,21 +14,16 @@ QList<HdlParserUseClause> HdlParserUseClause::parseText(const QStringRef text, Q
     while (useMatches.hasNext())
     {
         QRegularExpressionMatch m = useMatches.next();
-        HdlParserUseClause u;
-        u.mFilePath = filePath;
-        u.mLineNum = startingLine + text.left(m.capturedStart()).count('\n');
-        u.mLibraryName = m.captured("library");
-        u.mPackageName = m.captured("package");
-        u.mItemName = m.captured("item");
+        HdlParserUseClause u(m.captured("library"), m.captured("package"), m.captured("item"), file, startingLine + text.left(m.capturedStart()).count('\n'));
         uses.append(u);
     }
 
     return uses;
 }
 
-QString HdlParserUseClause::filePath() const
+HdlFile& HdlParserUseClause::file() const
 {
-    return mFilePath;
+    return mFile;
 }
 
 int HdlParserUseClause::lineNum() const
@@ -51,7 +46,8 @@ QString HdlParserUseClause::itemName() const
     return mItemName;
 }
 
-HdlParserUseClause::HdlParserUseClause()
+HdlParserUseClause::HdlParserUseClause(QString lib, QString pkg, QString item, HdlFile &file, int lineNum)
+    :mLibraryName(lib), mPackageName(pkg), mItemName(item), mFile(file), mLineNum(lineNum)
 {
 
 }

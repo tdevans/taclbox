@@ -4,41 +4,34 @@
 #include <QString>
 #include <QList>
 
-enum ePortDir {IN, OUT, BIDIR};
+#include "hdlparserportdirection.h"
+
+// Forward declare so we can make the pointer w/o including the
+// file, which would cause a circular reference because HdlFile
+// contains HdlParserArchitectureDefinitions.
+class HdlFile;
 
 class HdlParserPortDefinition
 {
 public:
-    HdlParserPortDefinition();
-    HdlParserPortDefinition(QString name, ePortDir dir, QString type);
-
-    static QList<HdlParserPortDefinition> parseText(const QStringRef text, QString filePath, int startingLine);
-
-    bool operator==(const HdlParserPortDefinition& other);
+    static QList<HdlParserPortDefinition> parseText(const QStringRef text, HdlFile& file, int startingLine);
 
     QString name() const;
-    void setName(QString name);
-
-    ePortDir dir() const;
-    QString dirString() const;
-    void setDir(ePortDir dir);
-
+    HdlParserPortDirection dir() const;
     QString type() const;
-    void setType(QString type);
-
-    QString filePath() const;
-
+    HdlFile& file() const;
     int lineNum() const;
 
 private:
     static const QString PORT_PATTERN;
 
     QString mName;
-    ePortDir mDir;
+    HdlParserPortDirection mDir;
     QString mType;
-    QString mFilePath;
+    HdlFile& mFile;
     int mLineNum;
 
+    HdlParserPortDefinition(QString name, HdlParserPortDirection dir, QString type, HdlFile& file, int lineNum);
 };
 
 #endif // HDLPARSERPORTDEFINITION_H

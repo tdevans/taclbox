@@ -5,12 +5,17 @@
 #include <QList>
 #include <QStringRef>
 
+// Forward declare so we can make the pointer w/o including the
+// file, which would cause a circular reference because HdlFile
+// contains HdlParserArchitectureDefinitions.
+class HdlFile;
+
 class HdlParserUseClause
 {
 public:
-    static QList<HdlParserUseClause> parseText(const QStringRef text, QString filePath, int startingLine);
+    static QList<HdlParserUseClause> parseText(const QStringRef text, HdlFile& file, int startingLine);
 
-    QString filePath() const;
+    HdlFile& file() const;
 
     int lineNum() const;
 
@@ -21,13 +26,13 @@ public:
 private:
     static const QString USE_CLAUSE_PATTERN;
 
-    QString mFilePath;
-    int mLineNum;
     QString mLibraryName;
     QString mPackageName;
     QString mItemName;
+    HdlFile& mFile;
+    int mLineNum;
 
-    HdlParserUseClause();
+    HdlParserUseClause(QString lib, QString pkg, QString item, HdlFile& file, int lineNum);
 };
 
 #endif // HDLPARSERUSECLAUSE_H

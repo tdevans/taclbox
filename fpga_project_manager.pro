@@ -9,14 +9,17 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    hdlfile.cpp \
     hdlparserarchitecturedefinition.cpp \
     hdlparsercomments.cpp \
     hdlparserentitydefinition.cpp \
     hdlparsergenericdefinition.cpp \
+    hdlparserlibrary.cpp \
     hdlparsermoduleinstantiation.cpp \
     hdlparserpackagebodydefinition.cpp \
     hdlparserpackageheaderdefinition.cpp \
     hdlparserportdefinition.cpp \
+    hdlparserportdirection.cpp \
     hdlparsersignaldefinition.cpp \
     hdlparsertypedefinition.cpp \
     hdlparseruseclause.cpp \
@@ -27,19 +30,20 @@ SOURCES += \
     projectmanager.cpp \
     projectsummarywidget.cpp \
     semanticversion.cpp \
-    sourcemanager.cpp \
-    unittesthdlparserdialog.cpp \
-    vhdldependencyparser.cpp
+    unittesthdlparserdialog.cpp
 
 HEADERS += \
+    hdlfile.h \
     hdlparserarchitecturedefinition.h \
     hdlparsercomments.h \
     hdlparserentitydefinition.h \
     hdlparsergenericdefinition.h \
+    hdlparserlibrary.h \
     hdlparsermoduleinstantiation.h \
     hdlparserpackagebodydefinition.h \
     hdlparserpackageheaderdefinition.h \
     hdlparserportdefinition.h \
+    hdlparserportdirection.h \
     hdlparsersignaldefinition.h \
     hdlparsertypedefinition.h \
     hdlparseruseclause.h \
@@ -49,9 +53,7 @@ HEADERS += \
     projectmanager.h \
     projectsummarywidget.h \
     semanticversion.h \
-    sourcemanager.h \
-    unittesthdlparserdialog.h \
-    vhdldependencyparser.h
+    unittesthdlparserdialog.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -66,4 +68,5 @@ test_data.path = $${OUT_PWD}/test
 test_data.files += test/*
 INSTALLS += test_data
 
-RESOURCES +=
+RESOURCES += \
+    assets.qrc

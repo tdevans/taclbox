@@ -6,18 +6,13 @@
 
 const QString HdlParserGenericDefinition::GENERIC_PATTERN = "(?<name>[a-z][a-z0-9_]*)\\s*:\\s+(?<type>[a-z][a-z0-9_\\s]*(?:\\([a-z0-9\\s]*\\))*)";
 
-HdlParserGenericDefinition::HdlParserGenericDefinition()
+HdlParserGenericDefinition::HdlParserGenericDefinition(QString name, QString type, HdlFile& file, int lineNum)
+    :mName(name), mType(type), mFile(file), mLineNum(lineNum)
 {
 
 }
 
-HdlParserGenericDefinition::HdlParserGenericDefinition(QString name, QString type)
-    :mName(name), mType(type)
-{
-
-}
-
-QList<HdlParserGenericDefinition> HdlParserGenericDefinition::parseText(const QStringRef text, QString filePath, int startingLine)
+QList<HdlParserGenericDefinition> HdlParserGenericDefinition::parseText(const QStringRef text, HdlFile& file, int startingLine)
 {
     QList<HdlParserGenericDefinition> generics;
 
@@ -27,14 +22,7 @@ QList<HdlParserGenericDefinition> HdlParserGenericDefinition::parseText(const QS
     while (genericMatches.hasNext())
     {
         QRegularExpressionMatch m = genericMatches.next();
-        //qDebug() << QString("Found port %1").arg(m.captured("name"));
-
-        HdlParserGenericDefinition g;
-        g.mName = m.captured("name");
-        g.mType = m.captured("type");
-        g.mFilePath = filePath;
-        g.mLineNum = startingLine + text.left(m.capturedStart()).count('\n');
-
+        HdlParserGenericDefinition g(m.captured("name"), m.captured("type"), file, startingLine + text.left(m.capturedStart()).count('\n'));
         generics.append(g);
     }
 
@@ -69,9 +57,9 @@ void HdlParserGenericDefinition::setType(QString type)
     mType = type;
 }
 
-QString HdlParserGenericDefinition::filePath() const
+HdlFile& HdlParserGenericDefinition::file() const
 {
-    return mFilePath;
+    return mFile;
 }
 
 int HdlParserGenericDefinition::lineNum() const

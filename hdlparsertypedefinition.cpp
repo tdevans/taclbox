@@ -9,18 +9,13 @@ const QString HdlParserTypeDefinition::ARRAY_PATTERN = "type\\s+(?<name>[a-z][a-
 const QString HdlParserTypeDefinition::UNCONSTRAINED_RANGE_PATTERN = "(?<name>[a-z][a-z0-9_]+)\\s+range\\s+<>";
 const QString HdlParserTypeDefinition::CONSTRAINED_RANGE_PATTERN = "(?<left>-?[0-9]+)\\s+(?<dir>to|downto)\\s+(?<right>-?[0-9]+)";
 
-HdlParserTypeDefinition::HdlParserTypeDefinition()
+HdlParserTypeDefinition::HdlParserTypeDefinition(QString name, TypeCategory category, HdlFile& file, int lineNum)
+    : mName(name), mCateogry(category), mFile(file), mLineNum(lineNum)
 {
 
 }
 
-HdlParserTypeDefinition::HdlParserTypeDefinition(QString name)
-    : mName(name)
-{
-
-}
-
-QList<HdlParserTypeDefinition> HdlParserTypeDefinition::parseText(const QStringRef text, QString filePath, int startingLine)
+QList<HdlParserTypeDefinition> HdlParserTypeDefinition::parseText(const QStringRef text, HdlFile& file, int startingLine)
 {
     QList<HdlParserTypeDefinition> types;
 
@@ -30,11 +25,7 @@ QList<HdlParserTypeDefinition> HdlParserTypeDefinition::parseText(const QStringR
     while (enumMatches.hasNext())
     {
         QRegularExpressionMatch m = enumMatches.next();
-        HdlParserTypeDefinition t;
-        t.mName = m.captured("name");
-        t.mCateogry = ENUM;
-        t.mFilePath = filePath;
-        t.mLineNum = startingLine + text.left(m.capturedStart()).count('\n');
+        HdlParserTypeDefinition t(m.captured("name"), ENUM, file, startingLine + text.left(m.capturedStart()).count('\n'));
 
         QStringList valList = m.captured("values").split(",");
         for (auto& v : valList)
@@ -52,11 +43,7 @@ QList<HdlParserTypeDefinition> HdlParserTypeDefinition::parseText(const QStringR
     while (scalarMatches.hasNext())
     {
         QRegularExpressionMatch m = scalarMatches.next();
-        HdlParserTypeDefinition t;
-        t.mName = m.captured("name");
-        t.mCateogry = SCALAR;
-        t.mFilePath = filePath;
-        t.mLineNum = startingLine + text.left(m.capturedStart()).count('\n');
+        HdlParserTypeDefinition t(m.captured("name"), SCALAR, file, startingLine + text.left(m.capturedStart()).count('\n'));
         t.mRangeLeft = m.captured("left").toDouble();
         t.mRangeRight = m.captured("right").toDouble();
         if (m.captured("dir") == "downto")
@@ -77,11 +64,7 @@ QList<HdlParserTypeDefinition> HdlParserTypeDefinition::parseText(const QStringR
     {
         QRegularExpressionMatch m = arrayMatches.next();
 
-        HdlParserTypeDefinition t;
-        t.mName = m.captured("name");
-        t.mCateogry = ARRAY;
-        t.mFilePath = filePath;
-        t.mLineNum = startingLine + text.left(m.capturedStart()).count('\n');
+        HdlParserTypeDefinition t(m.captured("name"), ARRAY, file, startingLine + text.left(m.capturedStart()).count('\n'));
         t.mArrayType = m.captured("type");
 
         QRegularExpressionMatchIterator unconstrainedRangeMatches = unconstrainedRegex.globalMatch(m.captured("dims"));
@@ -135,19 +118,9 @@ QList<HdlParserTypeDefinition> HdlParserTypeDefinition::parseText(const QStringR
     return types;
 }
 
-bool HdlParserTypeDefinition::operator==(const HdlParserTypeDefinition &other)
-{
-    return ((other.mName == mName) && (other.mEnumValues == mEnumValues));
-}
-
 HdlParserTypeDefinition::TypeCategory HdlParserTypeDefinition::category() const
 {
     return mCateogry;
-}
-
-void HdlParserTypeDefinition::setCateogry(TypeCategory c)
-{
-    mCateogry = c;
 }
 
 QString HdlParserTypeDefinition::name() const
@@ -155,32 +128,9 @@ QString HdlParserTypeDefinition::name() const
     return mName;
 }
 
-void HdlParserTypeDefinition::setName(QString name)
-{
-    mName = name;
-}
-
 QStringList HdlParserTypeDefinition::enumValues() const
 {
     return mEnumValues;
-}
-
-void HdlParserTypeDefinition::setEnumValues(QStringList ev)
-{
-    mEnumValues = ev;
-}
-
-void HdlParserTypeDefinition::addEnumValue(QString v)
-{
-    if (!mEnumValues.contains(v))
-    {
-        mEnumValues.append(v);
-    }
-}
-
-void HdlParserTypeDefinition::removeEnumValue(QString v)
-{
-    mEnumValues.removeAll(v);
 }
 
 double HdlParserTypeDefinition::rangeLeft() const
@@ -208,9 +158,9 @@ QString HdlParserTypeDefinition::arrayType() const
     return mArrayType;
 }
 
-QString HdlParserTypeDefinition::filePath() const
+HdlFile& HdlParserTypeDefinition::file() const
 {
-    return mFilePath;
+    return mFile;
 }
 
 int HdlParserTypeDefinition::lineNum() const

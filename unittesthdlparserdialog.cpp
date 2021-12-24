@@ -21,6 +21,7 @@
 #include "hdlparserpackagebodydefinition.h"
 #include "hdlparseruseclause.h"
 #include "hdlparsercomments.h"
+#include "hdlfile.h"
 
 UnitTestHdlParserDialog::UnitTestHdlParserDialog(QWidget *parent) :
     QDialog(parent),
@@ -486,24 +487,15 @@ void UnitTestHdlParserDialog::runTestCase(TestCase& tc)
 
 void UnitTestHdlParserDialog::runTestFile(TestFile& tf, ExpectFile& ef)
 {
-    QFile f(tf.filePath);
-    if (f.open(QIODevice::ReadOnly))
+    ui->testResultsTextEdit->appendPlainText(QString("Parsing %1...").arg(tf.filePath));
+    HdlFile f(tf.filePath);
+    if (!f.isNull())
     {
-        QString txt = removeComments(f.readAll());
-        f.close();
-
-        ui->testResultsTextEdit->appendPlainText(QString("Parsing %1...").arg(tf.filePath));
-
         // We'll set this to fail if any of the individual tests fails
         bool pass = true;
 
-        // Remove any comments so they don't mess up other parsing
-
-        // Parse the file to get the entities it defines
-        QList<HdlParserEntityDefinition> e = HdlParserEntityDefinition::parseText(QStringRef(&txt), tf.filePath, 1);
-
         // Check that all the entities we find are in the list of entities we expected to find
-        for (const auto& pe : e)
+        for (const auto& pe : f.entities())
         {
             ui->testResultsTextEdit->appendPlainText(QString("Found entity %1 on line %2").arg(pe.name()).arg(pe.lineNum()));
 
@@ -577,14 +569,14 @@ void UnitTestHdlParserDialog::runTestFile(TestFile& tf, ExpectFile& ef)
             // Make sure the ports we found are expected
             for (const auto& p : pe.ports())
             {
-                ui->testResultsTextEdit->appendPlainText(QString("\t\tname=%1, direction=%2, type=%3 @ line=%4").arg(p.name(), p.dirString(), p.type()).arg(p.lineNum()));
+                ui->testResultsTextEdit->appendPlainText(QString("\t\tname=%1, direction=%2, type=%3 @ line=%4").arg(p.name(), p.dir().toString(), p.type()).arg(p.lineNum()));
 
                 if (entityFound)
                 {
                     bool portFound = false;
                     for (const auto& ep : matchingEntity->ports)
                     {
-                        if ((ep.name == p.name()) && (ep.type == p.type()) && (ep.dir == p.dirString().toLower()))
+                        if ((ep.name == p.name()) && (ep.type == p.type()) && (ep.dir == p.dir().toString().toLower()))
                         {
                             portFound = true;
                             break;
@@ -606,7 +598,7 @@ void UnitTestHdlParserDialog::runTestFile(TestFile& tf, ExpectFile& ef)
                     bool portFound = false;
                     for (const auto& p : pe.ports())
                     {
-                        if ((ep.name == p.name()) && (ep.type == p.type()) && (ep.dir == p.dirString().toLower()))
+                        if ((ep.name == p.name()) && (ep.type == p.type()) && (ep.dir == p.dir().toString().toLower()))
                         {
                             portFound = true;
                             break;
@@ -625,7 +617,7 @@ void UnitTestHdlParserDialog::runTestFile(TestFile& tf, ExpectFile& ef)
         for (const auto& ed : ef.entityDefinitions)
         {
             bool found = false;
-            for (const auto& pe : e)
+            for (const auto& pe : f.entities())
             {
                 if (pe.name() == ed.name)
                 {
@@ -641,12 +633,8 @@ void UnitTestHdlParserDialog::runTestFile(TestFile& tf, ExpectFile& ef)
             }
         }
 
-
-        // Parse the file to get the architectures it defines
-        QList<HdlParserArchitectureDefinition> a = HdlParserArchitectureDefinition::parseText(QStringRef(&txt), tf.filePath, 1);
-
         // Make sure all the architectures we find in the file are ones we expected
-        for (const auto& pa : a)
+        for (const auto& pa : f.architectures())
         {
             ui->testResultsTextEdit->appendPlainText(QString("Found architecture %1 for entity %2 at line %3").arg(pa.name(), pa.entityName()).arg(pa.lineNum()));
             bool architectureFound = false;
@@ -744,13 +732,13 @@ void UnitTestHdlParserDialog::runTestFile(TestFile& tf, ExpectFile& ef)
             ui->testResultsTextEdit->appendPlainText("\tSignals:");
             for (const auto& s : pa.sigs())
             {
-                ui->testResultsTextEdit->appendPlainText(QString("\t\tname=%1, type=%2 @ line=%3").arg(s.name(), s.typeName()).arg(s.lineNum()));
+                ui->testResultsTextEdit->appendPlainText(QString("\t\tname=%1, type=%2 @ line=%3").arg(s.name(), s.type()).arg(s.lineNum()));
                 if (architectureFound)
                 {
                     bool signalFound = false;
                     for (const auto& es : matchingArchitecture->sigs)
                     {
-                        if ((es.name == s.name()) && (es.typeName == s.typeName()))
+                        if ((es.name == s.name()) && (es.typeName == s.type()))
                         {
                             signalFound = true;
                             break;
@@ -769,7 +757,7 @@ void UnitTestHdlParserDialog::runTestFile(TestFile& tf, ExpectFile& ef)
         for (const auto& ad : ef.architectureDefinitions)
         {
             bool architectureFound = false;
-            for (const auto& pa : a)
+            for (const auto& pa : f.architectures())
             {
                 if ((pa.name() == ad.name) && (pa.entityName() == ad.entityName))
                 {
@@ -787,8 +775,7 @@ void UnitTestHdlParserDialog::runTestFile(TestFile& tf, ExpectFile& ef)
 
         // Make sure all the package header definitions we find are expected
         ui->testResultsTextEdit->appendPlainText(QString("\tDefines Packages:"));
-        QList<HdlParserPackageHeaderDefinition> parsedPackages = HdlParserPackageHeaderDefinition::parseText(QStringRef(&txt), tf.filePath, 1);
-        for (const auto& parsedPackage : parsedPackages)
+        for (const auto& parsedPackage : f.packageHeaders())
         {
             ui->testResultsTextEdit->appendPlainText(QString("\t\t@line=%1: name=%2").arg(parsedPackage.lineNum()).arg(parsedPackage.name()));
             bool foundPackage = false;
@@ -812,7 +799,7 @@ void UnitTestHdlParserDialog::runTestFile(TestFile& tf, ExpectFile& ef)
         for (const auto& expectedPackage : ef.packageHeaderDefinitions)
         {
             bool foundPackage = false;
-            for (const auto& parsedPackage : parsedPackages)
+            for (const auto& parsedPackage : f.packageHeaders())
             {
                 if (parsedPackage.name() == expectedPackage.name)
                 {
@@ -830,8 +817,7 @@ void UnitTestHdlParserDialog::runTestFile(TestFile& tf, ExpectFile& ef)
 
         // Make sure all the package body definitions we find are expected
         ui->testResultsTextEdit->appendPlainText(QString("\tDefines Package Bodies:"));
-        QList<HdlParserPackageBodyDefinition> parsedPackageBodies = HdlParserPackageBodyDefinition::parseText(QStringRef(&txt), tf.filePath, 1);
-        for (const auto& parsedPackage : parsedPackageBodies)
+        for (const auto& parsedPackage : f.packageBodies())
         {
             ui->testResultsTextEdit->appendPlainText(QString("\t\t@line=%1: name=%2").arg(parsedPackage.lineNum()).arg(parsedPackage.name()));
             bool foundPackage = false;
@@ -855,7 +841,7 @@ void UnitTestHdlParserDialog::runTestFile(TestFile& tf, ExpectFile& ef)
         for (const auto& expectedPackage : ef.packageBodyDefinitions)
         {
             bool foundPackage = false;
-            for (const auto& parsedPackage : parsedPackageBodies)
+            for (const auto& parsedPackage : f.packageBodies())
             {
                 if (parsedPackage.name() == expectedPackage.name)
                 {
@@ -874,8 +860,7 @@ void UnitTestHdlParserDialog::runTestFile(TestFile& tf, ExpectFile& ef)
 
         // Make sure all the package use declarations we found were ones we were expecting
         ui->testResultsTextEdit->appendPlainText(QString("\tDepends on Packages:"));
-        QList<HdlParserUseClause> parsedUses = HdlParserUseClause::parseText(QStringRef(&txt), tf.filePath, 1);
-        for (const auto& parsedUse : parsedUses)
+        for (const auto& parsedUse : f.useClauses())
         {
             ui->testResultsTextEdit->appendPlainText(QString("\t\t@line=%1: library=%2, package=%3, item=%4").arg(parsedUse.lineNum()).arg(parsedUse.libraryName(), parsedUse.packageName(), parsedUse.itemName()));
             bool foundPackage = false;
@@ -899,7 +884,7 @@ void UnitTestHdlParserDialog::runTestFile(TestFile& tf, ExpectFile& ef)
         for (const auto& expectedPackage : ef.packageDependencies)
         {
             bool foundPackage = false;
-            for (const auto& parsedUse : parsedUses)
+            for (const auto& parsedUse : f.useClauses())
             {
                 if ((parsedUse.libraryName() == expectedPackage.libraryName) && (parsedUse.packageName() == expectedPackage.name))
                 {
@@ -916,48 +901,6 @@ void UnitTestHdlParserDialog::runTestFile(TestFile& tf, ExpectFile& ef)
         }
 
 
-        // Make sure all the module isntantiations we found were ones we were expecting
-        ui->testResultsTextEdit->appendPlainText(QString("\tDepends on Modules:"));
-        QList<HdlParserModuleInstantiation> parsedModules = HdlParserModuleInstantiation::parseText(QStringRef(&txt), tf.filePath, 1);
-        for (const auto& parsedModule : parsedModules)
-        {
-            ui->testResultsTextEdit->appendPlainText(QString("\t\t@line=%1: entity=%2, inst=%3, lib=%4, arch=%5").arg(parsedModule.lineNum()).arg(parsedModule.entityName(), parsedModule.instanceName(), parsedModule.libraryName(), parsedModule.architectureName()));
-            bool foundModule = false;
-            for (const auto& expectedModule : ef.moduleDependencies)
-            {
-                if ((parsedModule.instanceName() == expectedModule.instanceName) && (parsedModule.libraryName() == expectedModule.libraryName) && (parsedModule.entityName() == expectedModule.entityName) && (parsedModule.architectureName() == expectedModule.architectureName))
-                {
-                    foundModule = true;
-                    break;
-                }
-            }
-
-            if (!foundModule)
-            {
-                ui->testResultsTextEdit->appendHtml(QString("<span style=\"color: red\">Error: Found entity instantiation instName = %1, libraryName = %2, entityName = %3, architectureName = %4, but it was not expected.</span>").arg(parsedModule.instanceName(), parsedModule.libraryName(), parsedModule.entityName(), parsedModule.architectureName()));
-                pass = false;
-            }
-        }
-
-        // Make sure we found all of the modules we were expecting to find
-        for (const auto& expectedModule : ef.moduleDependencies)
-        {
-            bool foundModule = false;
-            for (const auto& parsedModule : parsedModules)
-            {
-                if ((parsedModule.instanceName() == expectedModule.instanceName) && (parsedModule.libraryName() == expectedModule.libraryName) && (parsedModule.entityName() == expectedModule.entityName) && (parsedModule.architectureName() == expectedModule.architectureName))
-                {
-                    foundModule = true;
-                    break;
-                }
-            }
-
-            if (!foundModule)
-            {
-                ui->testResultsTextEdit->appendHtml(QString("<span style=\"color: red\">Error: Unable to locate entity instantiation instName = %1, libraryName = %2, entityName = %3, architectureName = %4, but it was not expected.</span>").arg(expectedModule.instanceName, expectedModule.libraryName, expectedModule.entityName, expectedModule.architectureName));
-                pass = false;
-            }
-        }
 
         tf.testRun = true;
         tf.testPass = pass;
