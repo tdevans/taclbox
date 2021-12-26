@@ -5,11 +5,7 @@
 Project::Project(QString filePath, QObject *parent)
     :QObject(parent), mProjectFile(QFileInfo(filePath))
 {
-    if (mProjectFile.exists())
-    {
-        initializeSourceWatcher();
-        initializeTestbenchWatcher();
-    }
+
 }
 
 QString Project::name() const
@@ -126,20 +122,29 @@ QString Project::libifyString(QString str) const
 void Project::refreshSourceFiles()
 {
     QStringList vhdlFiles = sourceDir().entryList(QStringList("*.vhd"), QDir::Files);
+    bool changed = false;
 
     // Remove any source files that no longer exist
     QList<HdlFile> existingFiles;
-    for (auto x : mSourceFiles)
+    for (auto& x : mSourceFiles)
     {
         if (vhdlFiles.contains(x.fileName()))
         {
             existingFiles.append(x);
         }
+        else
+        {
+            changed = true;
+        }
     }
-    mSourceFiles = existingFiles;
+
+    if (changed)
+    {
+        mSourceFiles = existingFiles;
+    }
 
     // Add or update files
-    for (auto x : vhdlFiles)
+    for (auto& x : vhdlFiles)
     {
         int existingIndex = -1;
         for (int i = 0; i < mSourceFiles.size(); ++i)
@@ -154,10 +159,12 @@ void Project::refreshSourceFiles()
         if (existingIndex < 0)
         {
             // A new file was added
+            qDebug() << QString("Source file added: %1").arg(sourceDir().filePath(x));
             HdlFile f(sourceDir().filePath(x));
             if (!f.isNull())
             {
                 mSourceFiles.append(f);
+                changed = true;
             }
         }
         else
@@ -167,13 +174,21 @@ void Project::refreshSourceFiles()
             QFileInfo f(sourceDir().filePath(x));
             if (mSourceFiles[existingIndex].parseTime() < f.lastModified())
             {
+                qDebug() << QString("Source file modified: %1").arg(f.filePath());
                 HdlFile g(f.filePath());
                 if (!g.isNull())
                 {
                     mSourceFiles[existingIndex] = g;
+                    changed = true;
                 }
             }
         }
+    }
+
+    if (changed)
+    {
+        qDebug() << "Source files changed";
+        emit sourceFilesUpdated();
     }
 }
 

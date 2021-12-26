@@ -37,6 +37,11 @@ QString HdlFile::fileName() const
     return mFileInfo.fileName();
 }
 
+const QFileInfo &HdlFile::fileInfo() const
+{
+    return mFileInfo;
+}
+
 QDateTime HdlFile::parseTime() const
 {
     return mParseTime;

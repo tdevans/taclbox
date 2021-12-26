@@ -11,6 +11,8 @@
 #include "projectsummarywidget.h"
 #include "preferencesmanager.h"
 #include "hdlparserlibrary.h"
+#include "hdlfiletreewidgetitem.h"
+#include "texteditorwidget.h"
 
 namespace Ui {
 class MainWindow;
@@ -56,6 +58,9 @@ private slots:
     void closeProject();
     void openUnitTestDependencyParser();
     void refreshProjectStructure();
+    void fileTreeItemDoubleClicked(QTreeWidgetItem* item, int column);
+    void fileTreeHdlFileDoubleClicked(HdlFileTreeWidgetItem* item, int column);
+    void closeProjectContentTab(int index);
 };
 
 #endif // MAINWINDOW_H

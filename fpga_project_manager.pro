@@ -10,6 +10,7 @@ CONFIG += c++11
 
 SOURCES += \
     hdlfile.cpp \
+    hdlfiletreewidgetitem.cpp \
     hdlparserarchitecturedefinition.cpp \
     hdlparsercomments.cpp \
     hdlparserentitydefinition.cpp \
@@ -30,10 +31,12 @@ SOURCES += \
     projectmanager.cpp \
     projectsummarywidget.cpp \
     semanticversion.cpp \
+    texteditorwidget.cpp \
     unittesthdlparserdialog.cpp
 
 HEADERS += \
     hdlfile.h \
+    hdlfiletreewidgetitem.h \
     hdlparserarchitecturedefinition.h \
     hdlparsercomments.h \
     hdlparserentitydefinition.h \
@@ -53,6 +56,7 @@ HEADERS += \
     projectmanager.h \
     projectsummarywidget.h \
     semanticversion.h \
+    texteditorwidget.h \
     unittesthdlparserdialog.h
 
 # Default rules for deployment.

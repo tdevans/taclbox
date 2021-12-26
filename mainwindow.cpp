@@ -11,6 +11,8 @@
 #include <QCloseEvent>
 #include <QDir>
 #include <QIcon>
+#include "hdlfiletreewidgetitem.h"
+#include "texteditorwidget.h"
 
 MainWindow::MainWindow(PreferencesManager &preferencesManager, ProjectManager &projectManager, QWidget *parent) :
     QMainWindow(parent), ui(new Ui::MainWindow), mProjectManager(projectManager), mPreferencesManager(preferencesManager), mProjectSummaryTab(nullptr)
@@ -77,6 +79,8 @@ MainWindow::MainWindow(PreferencesManager &preferencesManager, ProjectManager &p
     connect(ui->actionExit, &QAction::triggered, qApp, &QCoreApplication::exit);
     connect(ui->actionDependency_Parser, &QAction::triggered, this, &MainWindow::openUnitTestDependencyParser);
     connect(ui->structureRefreshButton, &QPushButton::clicked, this, &MainWindow::refreshProjectStructure);
+    connect(ui->projectFilesTreeWidget, &QTreeWidget::itemDoubleClicked, this, &MainWindow::fileTreeItemDoubleClicked);
+    connect(ui->projectContentTabWidget, &QTabWidget::tabCloseRequested, this, &MainWindow::closeProjectContentTab);
 }
 
 MainWindow::~MainWindow()
@@ -164,18 +168,17 @@ void MainWindow::updateProject()
             mProjectSummaryTab->setProjectVersion(mProjectManager.project()->version());
         }
 
-        auto sfi = mProjectManager.project()->sourceFiles();
-        for (auto& fi : sfi)
+        auto& sfi = mProjectManager.project()->sourceFiles();
+        for (auto& i : sfi)
         {
-            QTreeWidgetItem* i = new QTreeWidgetItem();
-            if (i)
+            HdlFileTreeWidgetItem* item = new HdlFileTreeWidgetItem(i);
+            if (item)
             {
-                i->setText(0, fi.fileName());
-                mSourceFilesTreeWidgetItem->addChild(i);
+                mSourceFilesTreeWidgetItem->addChild(item);
             }
             else
             {
-                qDebug() << QString("Failed to allocate new QTreeWidgetItem to display source file %1").arg(fi.fileName());
+                qDebug() << QString("Failed to allocate new HdlFileTreeWidgetItem to display source file %1").arg(i.fileName());
             }
         }
     }
@@ -311,4 +314,58 @@ void MainWindow::openUnitTestDependencyParser()
 void MainWindow::refreshProjectStructure()
 {
     ui->projectStructureTreeWidget->clear();
+}
+
+void MainWindow::fileTreeItemDoubleClicked(QTreeWidgetItem* item, int column)
+{
+    HdlFileTreeWidgetItem* hdlFileItem = dynamic_cast<HdlFileTreeWidgetItem*>(item);
+    if (hdlFileItem)
+    {
+        fileTreeHdlFileDoubleClicked(hdlFileItem, column);
+    }
+}
+
+void MainWindow::fileTreeHdlFileDoubleClicked(HdlFileTreeWidgetItem* item, int column)
+{
+    auto& fi = item->hdlFile().fileInfo();
+    qDebug() << QString("Source file %1 double clicked...").arg(fi.filePath());
+
+    TextEditorWidget* e = nullptr;
+    for (int i = 0; i < ui->projectContentTabWidget->count(); ++i)
+    {
+        e = dynamic_cast<TextEditorWidget*>(ui->projectContentTabWidget->widget(i));
+        if (e)
+        {
+            if (e->fileInfo() == fi)
+            {
+                qDebug() << QString("Found existing tab for file %1").arg(e->fileInfo().filePath());
+                ui->projectContentTabWidget->setCurrentIndex(i);
+                break;
+            }
+            else
+            {
+                // Reset this for the logic below to know we didn't find a match
+                e = nullptr;
+            }
+        }
+    }
+
+    if (!e)
+    {
+        e = new TextEditorWidget(item->hdlFile().fileInfo());
+        if (e)
+        {
+            int i = ui->projectContentTabWidget->addTab(e, item->hdlFile().fileName());
+            ui->projectContentTabWidget->setCurrentIndex(i);
+        }
+        else
+        {
+            qDebug() << QString("Unable to allocate TextEditorWidget for file %1").arg(fi.fileName());
+        }
+    }
+}
+
+void MainWindow::closeProjectContentTab(int index)
+{
+    ui->projectContentTabWidget->removeTab(index);
 }

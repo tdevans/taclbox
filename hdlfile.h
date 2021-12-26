@@ -20,6 +20,7 @@ public:
     bool isNull() const;
     QString filePath() const;
     QString fileName() const;
+    const QFileInfo& fileInfo() const;
     QDateTime parseTime() const;
 
     const QList<HdlParserPackageHeaderDefinition>& packageHeaders() const;
